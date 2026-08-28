@@ -4,7 +4,7 @@
 
 {% block content %}
     {% if featured %}
-        <p>Приложение дня: <strong>{{ featured.name }}</strong></p>
+        <>Приложение дня:<li><strong><a href="{% url 'app_detail' featured.id %}">{{featured.name}}<a></strong> - {{featured.category}}<br>
     {% endif %}
 
     <h2>Приложения в магазине</h2>
@@ -12,7 +12,7 @@
     <ul>
     {% for app in apps %}
         <li>
-            <strong>{{ app.name }}</strong> — {{ app.category }}<br>
+            <li><strong><a href="{% url 'app_detail' app.id %}">{{app.name}}<a></strong> — {{ app.category }}<br>
             {{ app.description|truncatechars:60 }}<br>
             {% if app.price == 0 %}
                 Бесплатно

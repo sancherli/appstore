@@ -1,0 +1,23 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ app.name }} — AppStore{% endblock %}
+
+{% block content %}
+    <p><a href="{% url 'index' %}"><- Ко всем приложениям</a><p>
+
+    <h2>{{ app.name }}</h2>
+
+    <p>Категория:{{app.category|default: "Без категории" }}</p>
+
+    <p>
+        {% if app.price == 0 %}
+            Бесплатно
+        {% else %}
+            {{ app.price }} $
+        {% endif %}
+    </p>
+
+     <p>Категория:{{app.category|default: "Описание пока не добавлено" }}</p>
+
+     <p>Категория:{{app.created_at|date: "d.m.Y H:1" }}</p>
+{% endblock %}

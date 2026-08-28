@@ -1,14 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="(% static 'main/style.css' %}">
     <title>{% block title %}AppStore{% endblock %}</title>
 </head>
 <body>
     <h1>AppStore</h1>
     <nav>
-        <a href="{% url 'index' %}">Главная></a>
-         <a href="{% url 'about' %}">О магазине></a>
+        <a href="{% url 'index' %}"> Главная </a>
+         <a href="{% url 'about' %}"> О магазине </a>
     </nav>
 
     {% block content %}{% endblock %}

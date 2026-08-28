@@ -3,6 +3,10 @@
 {% block title %}Главная — AppStore{% endblock %}
 
 {% block content %}
+    {% if featured %}
+        <p>Приложение дня: <strong>{{ featured.name }}</strong></p>
+    {% endif %}
+
     <h2>Приложения в магазине</h2>
 
     <ul>

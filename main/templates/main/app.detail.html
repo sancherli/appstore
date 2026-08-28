@@ -17,7 +17,14 @@
         {% endif %}
     </p>
 
-     <p>Категория:{{app.category|default: "Описание пока не добавлено" }}</p>
+    <p>Категория:
+        {% if app.category %}
+            <a href="{% url 'category' app.category.id %}">{{ app.category }}</a>
+        {% else %}
+            без категории
+        {% endif %}
+    </p>
+
 
      <p>Категория:{{app.created_at|date: "d.m.Y H:1" }}</p>
 {% endblock %}

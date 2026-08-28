@@ -4,6 +4,13 @@
 
 {% block content %}
     {% if featured %}
+    <p>Категория:
+        {% if app.category %}
+            <a href="{% url 'category' app.category.id %}">{{ app.category }}</a>
+        {% else %}
+            без категории
+        {% endfor %}
+    </p>
         <>Приложение дня:<li><strong><a href="{% url 'app_detail' featured.id %}">{{featured.name}}<a></strong> - {{featured.category}}<br>
     {% endif %}
 

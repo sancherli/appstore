@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Новинки— AppStore{% endblock %}
+
+{% block content %}
+    <h2>Новинки</h2>
+
+    <ul>
+    {% for app in apps %}
+        <li>
+            <li><a href="{% url 'app_detail' app.id %}">{{app.name}}<a> -
+            добавлено: {{ app.created_at|date:"d.m.Y" }}
+            {% if app.price == 0 %}
+                Бесплатно
+            {% else %}
+                {{ app.price }} $
+            {% endif %}
+            <br>
+            добавлено {{ app.created_at|date:"d.m.Y" }}
+        </li>
+    {% empty %}
+        <li>Приложений пока нет.</li>
+    {% endfor %}
+    </ul>
+
+    <p>Всего приложений: {{ apps|length }}</p>
+{% endblock %}

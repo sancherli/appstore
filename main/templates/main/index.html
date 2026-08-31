@@ -1,37 +1,34 @@
 {% extends 'main/base.html' %}
 
-{% block title %}Главная — AppStore{% endblock %}
+{% block title %}Главная - AppStore{% endblock %}
 
 {% block content %}
-    {% if featured %}
-    <p>Категория:
-        {% if app.category %}
-            <a href="{% url 'category' app.category.id %}">{{ app.category }}</a>
-        {% else %}
-            без категории
+    <p>Категории:
+        {% for category in categories %}
+            <a href="{% url 'category' category.id %}">{{ category.name }}</a>
+            ({{ category.app_set.count }}){% if not forloop.last %} . {% endif %}
         {% endfor %}
     </p>
-        <>Приложение дня:<li><strong><a href="{% url 'app_detail' featured.id %}">{{featured.name}}<a></strong> - {{featured.category}}<br>
+
+    {% if featured %}
+        <p>Приложение дня: <strong><a href="{% url 'app_detail' featured.id %}">{{ featured.name }}</a></strong></p>
     {% endif %}
 
     <h2>Приложения в магазине</h2>
 
     <ul>
-    {% for app in apps %}
-        <li>
-            <li><strong><a href="{% url 'app_detail' app.id %}">{{app.name}}<a></strong> — {{ app.category }}<br>
+        {% for app in apps %}
+        <li><strong><a href="{% url 'app_detail' app.id %}">{{ app.name }}</a></strong> - {{ app.category }}<br>
             {{ app.description|truncatechars:60 }}<br>
             {% if app.price == 0 %}
                 Бесплатно
             {% else %}
                 {{ app.price }} $
             {% endif %}
-            <br>
-            добавлено {{ app.created_at|date:"d.m.Y" }}
         </li>
-    {% empty %}
-        <li>Приложений пока нет.</li>
-    {% endfor %}
+        {% empty %}
+        <li>Приложений пока нет</li>
+        {% endfor %}
     </ul>
 
     <p>Всего приложений: {{ apps|length }}</p>

@@ -1,0 +1,18 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Топ по цене - AppStore{% endblock %}
+
+{% block content %}
+
+<h1>Топ по цене</h1>
+
+{% for app in apps %}
+    <div>
+        <h2>{{ app.name }}</h2>
+        <p>Цена: {{ app.price }}</p>
+    </div>
+{% empty %}
+    <p>Платных приложений пока нет.</p>
+{% endfor %}
+
+{% endblock %}

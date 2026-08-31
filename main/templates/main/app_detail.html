@@ -7,7 +7,7 @@
 
     <h2>{{ app.name }}</h2>
 
-    <p>Категория:{{app.category|default: "Без категории" }}</p>
+    <p>Категория:{{app.category|default:"Без категории" }}</p>
 
     <p>
         {% if app.price == 0 %}
@@ -26,5 +26,5 @@
     </p>
 
 
-     <p>Категория:{{app.created_at|date: "d.m.Y H:1" }}</p>
+     <p>Категория:{{app.created_at|date:"d.m.Y H:1" }}</p>
 {% endblock %}

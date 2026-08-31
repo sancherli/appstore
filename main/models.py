@@ -25,3 +25,5 @@ class App(models.Model):
     class Meta:
         verbose_name = 'Приложение'
         verbose_name_plural = 'Приложения'
+
+

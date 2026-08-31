@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Бесплатные - AppStore{% endblock %}
+
+{% block content %}
+
+<h1>Бесплатные</h1>
+
+<p>Найдено приложений: {{ apps|length }}</p>
+
+{% for app in apps %}
+    <div>
+        <h2>{{ app.name }}</h2>
+        <p>{{ app.description }}</p>
+        <p>Цена: {{ app.price }}</p>
+    </div>
+{% empty %}
+    <p>Бесплатных приложений пока нет.</p>
+{% endfor %}
+
+{% endblock %}

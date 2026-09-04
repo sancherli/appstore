@@ -22,3 +22,11 @@ li {
     padding: 12px 16px;
     margin-bottom: 10px;
 }
+
+form {
+    margin: 20px auto;
+}
+
+button{
+    margin: 5px;
+}

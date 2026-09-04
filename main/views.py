@@ -1,17 +1,42 @@
+from os import name
 from django.apps.registry import Apps
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404
 from pyexpat import features
 from django.http import HttpResponse
 from django.shortcuts import render
 from .models import App,Category
+from django.core.paginator import Paginator
+
+SORTS = {
+    'new': '-created_at',
+    'name': 'name',
+    'price': 'price',
+    'expensive': '-price',
+}
 
 
 def index(request):
-    apps = App.objects.order_by('created_at').all()
+    q = request.GET.get('q', '')
+    sort = request.GET.get('sort', 'new')
+
+    if q:
+        apps = App.objects.filter(Q(name__icontains=q) | Q(description__icontains=q))
+    else:
+        apps = App.objects.all()
+
+    apps = apps.order_by(SORTS.get(sort,'-created_at'))
     featured = App.objects.order_by('-price').first()
     categories = Category.objects.all()
+
+    paginator = Paginator(apps, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'main/index.html', {
-        'apps': apps,
+        'q': q,
+        'sort': sort,
+        'page_obj': page_obj,
         'featured': featured,
         'categories': categories,
     })

@@ -16,6 +16,14 @@
         <a href="{% url 'top' %}">Топ по цене</a>
     </nav>
 
+  <form method="GET" action="{% url 'index' %}">
+    <input type="text" name="q" placeholder="Поиск приложений..." value="{{ q }}">
+      {% if reguest.GET.sort %}
+        <input type="text" name="sort" value="Поиск приложений..." value="{{ q }}">
+      {% endif %}
+    <button type="submit">Найти</button>
+  </form>
+
     {% block content %}{% endblock %}
 </body>
 </html>

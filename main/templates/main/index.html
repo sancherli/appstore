@@ -4,28 +4,37 @@
 
 {% block content %}
     <p>Категории:
-        {% for category in categories %}
-            <a href="{% url 'category' category.id %}">{{ category.name }}</a>
+   {% for category in categories %}
+    <a href="{% url 'main:category_detail' category.id %}">
+        {{ category.name }}
             ({{ category.app_set.count }}){% if not forloop.last %} . {% endif %}
         {% endfor %}
+    </a>
     </p>
 
-    {% if featured %}
-        <p>Приложение дня: <strong><a href="{% url 'app_detail' featured.id %}">{{ featured.name }}</a></strong></p>
-    {% endif %}
+   {% if featured %}
+    <p>
+        Приложение дня:
+        <strong>
+            <a href="{% url 'main:app_detail' featured.id featured.slug %}">
+                {{ featured.name }}
+            </a>
+        </strong>
+    </p>
+{% endif %}
 
     <h2>Приложения в магазине</h2>
 
     <p>
-        <a href="?sort=new{% if q %}&q={{ q }}{% endif %}">Новые</a>
-        <a href="?sort=name{% if q %}&q={{ q }}{% endif %}">По названию</a>
-        <a href="?sort=price{% if q %}&q={{ q }}{% endif %}">Сначала дешевые</a>
-        <a href="?sort=expensive{% if q %}&q={{ q }}{% endif %}">Сначала дорогие</a>
+        <a href="?sort=new{% if q %}&q={{ q }}{% endif %}">новые</a>
+        <a href="?sort=name{% if q %}&q={{ q }}{% endif %}">по названию</a>
+        <a href="?sort=price{% if q %}&q={{ q }}{% endif %}">сначала дешёвые</a>
+        <a href="?sort=expensive{% if q %}&q={{ q }}{% endif %}">сначала дорогие</a>
     </p>
 
     <ul>
         {% for app in page_obj %}
-        <li><strong><a href="{% url 'app_detail' app.id %}">{{ app.name }}</a></strong> - {{ app.category }}<br>
+        <li><strong><a href="{% url 'main:app_detail' app.id app.slug %}">{{ app.name }}</a></strong> - {{ app.category }}<br>
             {{ app.description|truncatechars:60 }}<br>
             {% if app.price == 0 %}
                 Бесплатно
@@ -38,20 +47,21 @@
         {% endfor %}
     </ul>
 
-
     <p>
-    {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}&sort={{ sort }}&q={{ q|urlencode }}">← назад</a>
-    {% endif %}
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&sort={{ sort }}&q={{ q }}"><- back</a>
+        {% else %}
+            <- back
+        {% endif %}
 
-    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
-    {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}&sort={{ sort }}&q={{ q|urlencode }}">вперёд →</a>
-    {% endif %}
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&sort={{ sort }}&q={{ q }}">next -></a>
+        {% else %}
+            next ->
+        {% endif %}
     </p>
-
-<p>Всего найдено: {{ page_obj.paginator.count }}</p>
-
 
     <p>Всего приложений: {{ page_obj|length }}</p>
 {% endblock %}

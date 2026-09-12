@@ -1,0 +1,18 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+
+<h1>Бесплатные приложения: {{ category.name }}</h1>
+
+{% for app in apps %}
+    <p>
+        <a href="{% url 'main:app_detail' app.id app.slug %}">
+            {{ app.name }}
+        </a>
+        — Бесплатно
+    </p>
+{% empty %}
+    <p>Бесплатных приложений в этой категории нет.</p>
+{% endfor %}
+
+{% endblock %}

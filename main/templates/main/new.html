@@ -1,27 +1,40 @@
 {% extends 'main/base.html' %}
 
-{% block title %}Новинки— AppStore{% endblock %}
+{% block title %}Новинки - AppStore{% endblock %}
 
 {% block content %}
     <h2>Новинки</h2>
 
     <ul>
-    {% for app in apps %}
-        <li>
-            <li><a href="{% url 'app_detail' app.id %}">{{app.name}}<a> -
+        {% for app in apps %}
+        <li><a href="{% url 'main:app_detail' app.id app.slug %}">{{ app.name }}</a> -
             добавлено: {{ app.created_at|date:"d.m.Y" }}
             {% if app.price == 0 %}
                 Бесплатно
             {% else %}
                 {{ app.price }} $
             {% endif %}
-            <br>
-            добавлено {{ app.created_at|date:"d.m.Y" }}
         </li>
-    {% empty %}
-        <li>Приложений пока нет.</li>
-    {% endfor %}
+        {% empty %}
+        <li>Приложений пока нет</li>
+        {% endfor %}
     </ul>
+
+      <p>
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }"><- back</a>
+        {% else %}
+            <- back
+        {% endif %}
+
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }">next -></a>
+        {% else %}
+            next ->
+        {% endif %}
+    </p>
 
     <p>Всего приложений: {{ apps|length }}</p>
 {% endblock %}

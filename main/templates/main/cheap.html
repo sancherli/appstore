@@ -1,0 +1,19 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+
+<h1>Платные приложения дешевле 100</h1>
+
+{% for app in apps %}
+    <p>
+        <a href="{% url 'main:app_detail' app.id app.slug %}">
+            {{ app.name }}
+        </a>
+        — {{ app.price }} $
+    </p>
+{% empty %}
+    <p>Подходящих приложений нет.</p>
+{% endfor %}
+
+{% endblock %}
+

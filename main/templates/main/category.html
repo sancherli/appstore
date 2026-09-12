@@ -1,24 +1,31 @@
 {% extends 'main/base.html' %}
 
-{% block title %}{{ category.name }} — AppStore{% endblock %}
-
 {% block content %}
-    <p><a href="{% url 'index' %}">← ко всем приложениям</a></p>
 
-    <h2>Категория: {{ category.name }}</h2>
+<h1>{{ category.name }}</h1>
 
-    <ul>
-    {% for app in apps %}
-        <li>
-            <a href="{% url 'app_detail' app.id %}">{{ app.name }}</a> —
-            {% if app.price == 0 %}Бесплатно{% else %}{{ app.price }} ${% endif %}
-        </li>
-    {% empty %}
-        <li>В этой категории пока пусто.</li>
-    {% endfor %}
-    </ul>
+{% for app in apps %}
+    <p>
+        <a href="{% url 'main:app_detail' app.id app.slug %}">
+            {{ app.name }}
+        </a>
+    </p>
+{% empty %}
+    <p>В категории пока нет приложений.</p>
+{% endfor %}
 
-    <p>Всего в категории: {{ apps|length }}</p>
+
+<h2>Самое дорогое приложение</h2>
+
+{% if most_expensive %}
+    <div>
+        <strong>{{ most_expensive.name }}</strong>
+        — {{ most_expensive.price }} $
+    </div>
+{% else %}
+    <p>В категории пока нет приложений.</p>
+{% endif %}
+
+<p>Всего в категории: {{ apps|length }}</p>
+
 {% endblock %}
-
-

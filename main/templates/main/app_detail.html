@@ -25,4 +25,45 @@
     {% endif %}
 </p>
 
+
+<section>
+    <h2>Отзывы ({{ reviews|length }})</h2>
+
+    {% for review in reviews %}
+        <article>
+            <p>
+                <strong>{{ review.username }}</strong>
+                — оценка: {{ review.stars }}/5
+                —
+                {% if review.recommended %}
+                    Рекомендует
+                {% else %}
+                    Не рекомендует
+                {% endif %}
+            </p>
+            {% if review.comment %}
+                <p>{{ review.comment }}</p>
+            {% endif %}
+            <p><small>{{ review.created_at|date:"d.m.Y H:i" }}</small></p>
+        </article>
+    {% empty %}
+        <p>Отзывов пока нет. Будьте первым!</p>
+    {% endfor %}
+</section>
+
+<section>
+    <h2>Оставить отзыв</h2>
+
+    <form method="post" action="{% url 'main:add_review' app.id %}">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">Отправить отзыв</button>
+    </form>
+</section>
+
+
+
+
 {% endblock %}

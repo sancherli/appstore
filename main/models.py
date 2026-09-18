@@ -33,11 +33,14 @@ class App(models.Model):
         verbose_name_plural = 'Приложения'
 
 class Review(models.Model):
-    name = models.CharField(max_length=100)
     app = models.ForeignKey(App, on_delete=models.CASCADE)
+    username = models.CharField(max_length=50)
+    comment = models.TextField(blank=True)
+    email = models.EmailField(max_length=100)
     rating = models.PositiveIntegerField()
-    comment = models.TextField()
+    stars = models.PositiveIntegerField(default=5)
     recommended = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.name} → {self.app.name}"
+        return f"{self.username} > {self.app.name}"

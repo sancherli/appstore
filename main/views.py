@@ -1,13 +1,14 @@
 from http.client import responses
 from django.db.models.fields import return_None
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse,HttpResponse
 from django.db.models import Q
 from django.core.paginator import Paginator
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import TemplateView, ListView, DetailView
 from pyexpat.errors import messages
 from .models import App, Category, Review
+from .forms import ReviewForm
 
 SORTS = {
     'new': '-created_at',
@@ -102,7 +103,8 @@ class AppDetailView(DetailView):
         ).exclude(
             id=app.id
         )[:3]
-
+        context['form'] = ReviewForm()
+        context['reviews'] = app.review_set.order_by('-created_at')
         return context
 
 
@@ -153,8 +155,37 @@ class AppsDetailView(DetailView):
         ).exclude(
             id=app.id
         )[:3]
-
+        context['form'] = ReviewForm()
+        context['reviews'] = app.review_set.order_by('-created_at')
         return context
+
+
+@require_POST
+def add_review(request, app_id):
+    app = get_object_or_404(App, id=app_id)
+    form = ReviewForm(request.POST)
+
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.app = app
+        review.save()
+        return redirect('main:app_detail', app_id=app.id)
+
+    reviews = app.review_set.order_by('-created_at')
+    similar_apps = (
+        App.objects.filter(
+            price__gte=app.price - 10,
+            price__lte=app.price + 10,
+        )
+        .exclude(id=app.id)[:3]
+    )
+    return render(request, 'main/app_detail.html', {
+        'app': app,
+        'form': form,
+        'reviews': reviews,
+        'recommented': similar_apps,
+        'similar_apps': similar_apps,
+    })
 
 
 def no_category(request):
@@ -226,3 +257,5 @@ class AppsListView(ListView):
             context['title'] = 'Платные приложения'
 
         return context
+
+

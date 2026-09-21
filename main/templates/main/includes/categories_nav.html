@@ -1,0 +1,15 @@
+{% block categories %}
+<p class="categories-nav">
+    Категории:
+
+    {% for category in categories %}
+        <a href="{% url 'main:category_detail' category.id %}"
+           {% if request.resolver_match.url_name == 'category' and request.resolver_match.kwargs.category_id == category.id %}class="active"{% endif %}>
+            {{ category.name }}
+        </a>
+        ({{ category.apps_count }}){% if not forloop.last %} · {% endif %}
+    {% empty %}
+        пока нет
+    {% endfor %}
+</p>
+{% endblock %}

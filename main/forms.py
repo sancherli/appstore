@@ -1,7 +1,5 @@
 from django import forms
-
 from .models import Review
-
 
 class ReviewForm(forms.ModelForm):
     class Meta:
@@ -33,3 +31,4 @@ class ReviewForm(forms.ModelForm):
         if stars < 1 or stars > 5:
             raise forms.ValidationError('Оценка должна быть от 1 до 5')
         return stars
+

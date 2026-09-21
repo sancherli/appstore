@@ -11,7 +11,7 @@ urlpatterns = [
     path('about/', views.AboutView.as_view(), name='about'),
     path('reviews/', views.reviews, name='reviews'),
     path('top/', views.top_apps, name='top'),
-    path('app/<int:app_id>/', views.AppsDetailView.as_view(), name='app_detail'),
+    # path('app/<int:app_id>/', views.AppsDetailView.as_view(), name='app_detail'),
     path('app/<int:app_id>/review/', views.add_review, name='add_review'),
 
     path('new/', views.new, name='new'),

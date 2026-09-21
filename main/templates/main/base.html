@@ -1,12 +1,18 @@
+{% include 'main/includes/categories_nav.html' %}
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{% static 'main/style.css' %}">
-    <title>{% block title %}AppStore{% endblock %}</title>
+    <title>
+        {% block title %}App Store{% endblock %}
+    </title>
+    <link rel="stylesheet" href="{% static 'mainapp/style.css' %}">
 </head>
-<body>
+
+</body>
+</html>
     <h1>AppStore</h1>
     <nav>
         <a href="{% url 'main:index' %}">Главная</a>
@@ -15,6 +21,8 @@
         <a href="{% url 'main:free_apps' %}">Бесплатные</a>
         <a href="{% url 'main:paid_apps' %}">Платные</a>
     </nav>
+
+    {% block categories %} {% endblock %}
 
 {% if request.path == '/free/' %}
     <strong>
@@ -31,9 +39,7 @@
         <button type="submit">Найти</button>
     </form>
 
-    {% block content %}
-
-{% endblock %}
-
+    {% block content %} {% endblock %}
+    <footer>Всего на сайте: категорий{{ category_total }} и {{ apps_total }} приложений</footer>
 </body>
 </html>

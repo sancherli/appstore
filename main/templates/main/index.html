@@ -3,14 +3,6 @@
 {% block title %}Главная - AppStore{% endblock %}
 
 {% block content %}
-    <p>Категории:
-   {% for category in categories %}
-    <a href="{% url 'main:category_detail' category.id %}">
-        {{ category.name }}
-            ({{ category.app_set.count }}){% if not forloop.last %} . {% endif %}
-        {% endfor %}
-    </a>
-    </p>
 
    {% if featured %}
     <p>
@@ -63,5 +55,5 @@
         {% endif %}
     </p>
 
-    <p>Всего приложений: {{ page_obj|length }}</p>
+    <p>Всего приложений на странице: {{ page_obj|length }}</p>
 {% endblock %}

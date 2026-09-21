@@ -51,26 +51,21 @@ class IndexView(TemplateView):
 def index(request):
     q = request.GET.get('q', '')
     sort = request.GET.get('sort', 'new')
-
     if q:
         apps = App.objects.filter(Q(name__icontains=q) | Q(description__icontains=q))
     else:
         apps = App.objects.all()
-
     apps = apps.order_by(SORTS.get(sort, '-created_at'))
     featured = App.objects.order_by('-price').first()
     categories = Category.objects.all()
-
     paginator = Paginator(apps, 3)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
     return render(request, 'main/index.html', {
         'q': q,
         'sort': sort,
         'page_obj': page_obj,
         'featured': featured,
-        'categories': categories,
     })
 
 def reviews(request):
@@ -197,12 +192,10 @@ def no_category(request):
 
 def free_by_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
-
     apps = App.objects.filter(
         category=category,
         price=0
     )
-
     return render(request, 'main/free_by_category.html', {
         'category': category,
         'apps': apps

@@ -44,3 +44,26 @@ footer {
     font-size: 0.9 mm;
 }
 
+.app-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 10px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.app-icon-lg {
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+nav a.active {
+    font-weight: bold;
+}
+
+.categories-nav a.active {
+    font-weight: bold;
+}

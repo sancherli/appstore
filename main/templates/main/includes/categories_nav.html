@@ -3,11 +3,15 @@
     Категории:
 
     {% for category in categories %}
-        <a href="{% url 'main:category_detail' category.id %}"
-           {% if request.resolver_match.url_name == 'category' and request.resolver_match.kwargs.category_id == category.id %}class="active"{% endif %}>
-            {{ category.name }}
+        <a href="{% url 'main:category_detail' category.id %}"> {{ category.name }} </a>
+           {% if request.resolver_match.url_name == 'category_detail' and request.resolver_match.kwargs.category_id == category.id %}
+               class="active"
+           {% endif %}
         </a>
-        ({{ category.apps_count }}){% if not forloop.last %} · {% endif %}
+
+        ({{ category.apps_count }})
+
+        {% if not forloop.last %} · {% endif %}
     {% empty %}
         пока нет
     {% endfor %}

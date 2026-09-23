@@ -4,14 +4,15 @@
 
 {% block content %}
 
-   {% if featured %}
+{% if featured %}
     <p>
         Приложение дня:
-        <strong>
-            <a href="{% url 'main:app_detail' featured.id featured.slug %}">
-                {{ featured.name }}
-            </a>
-        </strong>
+        <a href="{% url 'main:app_detail' featured.id featured.slug %}">
+            {{ featured.name }}
+        </a>
+        {% if featured.icon %}
+            <img src="{{ featured.icon.url }}" alt="" class="app-icon">
+        {% endif %}
     </p>
 {% endif %}
 
@@ -26,17 +27,21 @@
 
     <ul>
         {% for app in page_obj %}
-        <li><strong><a href="{% url 'main:app_detail' app.id app.slug %}">{{ app.name }}</a></strong> - {{ app.category }}<br>
+        <li>
+            {% if app.icon %}
+                <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="app-icon">
+            {% endif %}
+            <strong><a href="{% url 'main:app_detail' app.id app.slug %}">{{ app.name }}</a></strong> - {{ app.category }}<br>
             {{ app.description|truncatechars:60 }}<br>
             {% if app.price == 0 %}
                 Бесплатно
             {% else %}
                 {{ app.price }} $
             {% endif %}
-        </li>
         {% empty %}
         <li>Приложений пока нет</li>
         {% endfor %}
+        </li>
     </ul>
 
     <p>

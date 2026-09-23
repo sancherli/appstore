@@ -1,0 +1,15 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Добавить приложение - AppStore{% endblock %}
+
+{% block content %}
+    <h2>Добавить приложение</h2>
+    <p>Заполните карточку и при желании загрузите иконку — она появится в каталоге.</p>
+
+    <form method="post" action="{% url 'main:add_app' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Опубликовать</button>
+    </form>
+
+{% endblock %}

@@ -8,7 +8,7 @@ from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import TemplateView, ListView, DetailView
 from pyexpat.errors import messages
 from .models import App, Category, Review
-from .forms import ReviewForm
+from .forms import ReviewForm, AppForm
 
 SORTS = {
     'new': '-created_at',
@@ -159,13 +159,15 @@ class AppsDetailView(DetailView):
 def add_review(request, app_id):
     app = get_object_or_404(App, id=app_id)
     form = ReviewForm(request.POST)
-
     if form.is_valid():
         review = form.save(commit=False)
         review.app = app
         review.save()
-        return redirect('main:app_detail', app_id=app.id)
-
+        return redirect(
+            'main:app_detail',
+            app_id=app.id,
+            slug=app.slug
+        )
     reviews = app.review_set.order_by('-created_at')
     similar_apps = (
         App.objects.filter(
@@ -178,7 +180,6 @@ def add_review(request, app_id):
         'app': app,
         'form': form,
         'reviews': reviews,
-        'recommented': similar_apps,
         'similar_apps': similar_apps,
     })
 
@@ -219,13 +220,13 @@ def top_apps(request):
 
 def api_app_detail(request, app_id):
     app = get_object_or_404(App, id=app_id)
-    data = {
+    return JsonResponse({
         'id': app.id,
         'name': app.name,
         'description': app.description,
         'price': str(app.price),
-    }
-    return JsonResponse(data)
+        'icon': app.icon.url if app.icon else None,
+    })
 
 
 class AppsListView(ListView):
@@ -252,3 +253,12 @@ class AppsListView(ListView):
         return context
 
 
+def add_app(request):
+    if request.method == 'POST':
+        form = AppForm(request.POST,request.FILES)
+        if form.is_valid():
+            app = form.save()
+            return redirect('main:app_detail',app_id=app.id,slug=app.slug)
+    else:
+        form = AppForm()
+    return render(request, 'main/add_app.html', {'form': form})

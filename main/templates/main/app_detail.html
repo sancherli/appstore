@@ -1,7 +1,8 @@
 {% extends 'main/base.html' %}
+{% load static %}
 
 {% block title %}
-    {{ app.name }} - AppStore
+    {{ app.name }} — AppStore
 {% endblock %}
 
 {% block content %}
@@ -11,6 +12,20 @@
         ← ко всем приложениям
     </a>
 </p>
+
+{% if app.icon %}
+    <p>
+        <img src="{{ app.icon.url }}"
+             alt="{{ app.name }}"
+             class="app-icon-lg">
+    </p>
+{% else %}
+    <p>
+        <img src="{% static 'main/placeholder.png' %}"
+             alt="Нет иконки"
+             class="app-icon-lg">
+    </p>
+{% endif %}
 
 <h2>{{ app.name }}</h2>
 
@@ -25,6 +40,42 @@
     {% endif %}
 </p>
 
+{% if app.description %}
+    <p>{{ app.description }}</p>
+{% endif %}
+
+<p>
+    {% if app.price == 0 %}
+        Бесплатно
+    {% else %}
+        {{ app.price }} ₽
+    {% endif %}
+</p>
+
+<h3>Примерно за те же деньги</h3>
+
+{% for similar in similar_apps %}
+    <div>
+        {% if similar.icon %}
+            <img src="{{ similar.icon.url }}"
+                 alt="{{ similar.name }}"
+                 class="app-icon">
+        {% else %}
+            <img src="{% static 'main/placeholder.png' %}"
+                 alt="Нет иконки"
+                 class="app-icon">
+        {% endif %}
+
+        <a href="{% url 'main:app_detail' similar.id similar.slug %}">
+            {{ similar.name }}
+        </a>
+
+        — {{ similar.price }} ₽
+    </div>
+
+{% empty %}
+    <p>Похожих по цене приложений нет.</p>
+{% endfor %}
 
 <section>
     <h2>Отзывы ({{ reviews|length }})</h2>
@@ -41,11 +92,16 @@
                     Не рекомендует
                 {% endif %}
             </p>
+
             {% if review.comment %}
                 <p>{{ review.comment }}</p>
             {% endif %}
-            <p><small>{{ review.created_at|date:"d.m.Y H:i" }}</small></p>
+
+            <p>
+                <small>{{ review.created_at|date:"d.m.Y H:i" }}</small>
+            </p>
         </article>
+
     {% empty %}
         <p>Отзывов пока нет. Будьте первым!</p>
     {% endfor %}
@@ -59,7 +115,9 @@
 
         {{ form.as_p }}
 
-        <button type="submit">Отправить отзыв</button>
+        <button type="submit">
+            Отправить отзыв
+        </button>
     </form>
 </section>
 

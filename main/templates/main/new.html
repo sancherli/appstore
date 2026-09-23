@@ -6,35 +6,26 @@
     <h2>Новинки</h2>
 
     <ul>
-        {% for app in apps %}
-        <li><a href="{% url 'main:app_detail' app.id app.slug %}">{{ app.name }}</a> -
-            добавлено: {{ app.created_at|date:"d.m.Y" }}
-            {% if app.price == 0 %}
-                Бесплатно
-            {% else %}
-                {{ app.price }} $
-            {% endif %}
-        </li>
+        {% for app in page_obj %}
+            {% include 'main/includes/app_list_item.html' %}
         {% empty %}
-        <li>Приложений пока нет</li>
+            <li>Приложений пока нет</li>
         {% endfor %}
     </ul>
 
-      <p>
+    <p>
         {% if page_obj.has_previous %}
-            <a href="?page={{ page_obj.previous_page_number }"><- back</a>
+            <a href="?page={{ page_obj.previous_page_number }}">← back</a>
         {% else %}
-            <- back
+            ← back
         {% endif %}
-
         Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
-
         {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }">next -></a>
+            <a href="?page={{ page_obj.next_page_number }}">next →</a>
         {% else %}
-            next ->
+            next →
         {% endif %}
     </p>
+    <p>Всего приложений: {{ page_obj.paginator.count }}</p>
 
-    <p>Всего приложений: {{ apps|length }}</p>
 {% endblock %}

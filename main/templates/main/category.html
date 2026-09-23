@@ -3,7 +3,6 @@
 {% block content %}
 
 <h1>{{ category.name }}</h1>
-
 {% for app in apps %}
     <p>
         <a href="{% url 'main:app_detail' app.id app.slug %}">

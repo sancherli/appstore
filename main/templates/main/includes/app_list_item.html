@@ -1,0 +1,39 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Главная - AppStore{% endblock %}
+
+{% block content %}
+
+{% load static %}
+
+<li>
+    {% if app.icon %}
+        <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="app-icon">
+    {% else %}
+        <img src="{% static 'main/placeholder.png' %}" alt="Нет иконки" class="app-icon">
+    {% endif %}
+
+    <a href="{% url 'main:app_detail' app.id app.slug %}">
+        {{ app.name }}
+    </a>
+
+    <strong>
+        <a href="{% url 'main:app_detail' app.id app.slug %}">
+            {{ app.name }}
+        </a>
+    </strong>
+    {% if app.category %}
+        - {{ app.category }}
+    {% endif %}
+
+    <br>
+    {{ app.description|truncatechars:60 }}
+    <br>
+
+    {% if app.price == 0 %}
+        Бесплатно
+    {% else %}
+        {{ app.price }} $
+    {% endif %}
+</li>
+{% endblock %}

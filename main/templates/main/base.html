@@ -1,6 +1,5 @@
-{% include 'main/includes/categories_nav.html' %}
-
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -8,38 +7,54 @@
     <title>
         {% block title %}App Store{% endblock %}
     </title>
-    <link rel="stylesheet" href="{% static 'mainapp/style.css' %}">
+    <link rel="stylesheet" href="{% static 'main/style.css' %}">
 </head>
 
-</body>
-</html>
+<body>
+    {% include 'main/includes/categories_nav.html' %}
     <h1>AppStore</h1>
+
     <nav>
         <a href="{% url 'main:index' %}">Главная</a>
-        <a href="{% url 'main:new' %}">Новые приложения</a>
-        <a href="{% url 'main:about' %}">О магазине</a>
-        <a href="{% url 'main:free_apps' %}">Бесплатные</a>
-        <a href="{% url 'main:paid_apps' %}">Платные</a>
+        <a href="{% url 'main:new' %}"> Новые приложения </a>
+        <a href="{% url 'main:about' %}"> О магазине </a>
+        <a href="{% url 'main:free_apps' %}"> Бесплатные </a>
+        <a href="{% url 'main:paid_apps' %}"> Платные </a>
+        <a href="{% url 'main:add_app' %}"
+           {% if request.resolver_match.url_name == 'add_app' %}
+               class="active"
+           {% endif %}>
+            Добавить приложение
+        </a>
     </nav>
 
-    {% block categories %} {% endblock %}
-
-{% if request.path == '/free/' %}
-    <strong>
-       <a href="{% url 'main:free' %}">Бесплатные</a>
-    </strong>
-
-{% endif %}
-
     <form method="GET" action="{% url 'main:index' %}">
-        <input type="text" name="q" placeholder="Поиск приложений..." value="{{ q }}">
+        <input
+            type="text"
+            name="q"
+            placeholder="Поиск приложений..."
+            value="{{ q }}"
+        >
         {% if request.GET.sort %}
-            <input type="hidden" name="sort" value="{{ request.GET.sort }}">
+            <input
+                type="hidden"
+                name="sort"
+                value="{{ request.GET.sort }}"
+            >
         {% endif %}
+
         <button type="submit">Найти</button>
     </form>
 
-    {% block content %} {% endblock %}
-    <footer>Всего на сайте: категорий{{ category_total }} и {{ apps_total }} приложений</footer>
+    {% block content %}
+    {% endblock %}
+
+<footer>
+    Всего на сайте:
+    категорий {{ category_total }},
+    приложений {{ apps_total }},
+    отзывов {{ reviews_total }}
+</footer>
+
 </body>
 </html>

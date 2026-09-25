@@ -1,0 +1,22 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Вход - AppStore{% endblock %}
+
+{% block content %}
+    <h2>Вход</h2>
+
+    <p>Войдите, чтобы добавлять приложения и отзывы от своего имени.</p>
+
+    <form method="post" action="{% url 'main:login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Войти</button>
+    </form>
+
+    <p>
+        Нет аккаунта?
+        <a href="{% url 'main:register' %}">
+            Зарегистрироваться
+        </a>
+    </p>
+{% endblock %}

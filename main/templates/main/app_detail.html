@@ -107,6 +107,13 @@
     {% endfor %}
 </section>
 
+{% if user.is_authenticated %}
+    <p>Отзыв будет опубликован от имени <strong>{{ user.username }}</strong>.</p>
+{% else %}
+    <p>Вы можете оставить отзыв без входа или <a href="{% url 'main:login' %}">войти</a>, чтобы подписать его своим аккаунтом.</p>
+{% endif %}
+
+
 <section>
     <h2>Оставить отзыв</h2>
 

@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Регистрация - AppStore{% endblock %}
+
+{% block content %}
+    <h2>Регистрация</h2>
+    <p>Создайте аккаунт, чтобы публиковать приложения в магазине.</p>
+
+    <form method="post" action="{% url 'main:register' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+
+    <p>Уже есть аккаунт? <a href="{% url 'main:login' %}">Войти</a></p>
+{% endblock %}
+

@@ -1,3 +1,4 @@
+from ast import Store
 from http.client import responses
 from django.db.models.fields import return_None
 from django.shortcuts import render, get_object_or_404, redirect
@@ -6,9 +7,16 @@ from django.db.models import Q
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_POST, require_GET
 from django.views.generic import TemplateView, ListView, DetailView
-from pyexpat.errors import messages
+
+from django.contrib.auth import login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
+
 from .models import App, Category, Review
-from .forms import ReviewForm, AppForm
+from .forms import ReviewForm, AppForm, RegisterForm
 
 SORTS = {
     'new': '-created_at',
@@ -35,9 +43,9 @@ class AppDetailView(DetailView):
     context_object_name = 'app'
     pk_url_kwarg = 'app_id'
 
+
 class IndexView(TemplateView):
     template_name = 'main/index.html'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -133,6 +141,7 @@ def new(request):
 def archive_year(request, year):
     return HttpResponse(f"Вы открыли архив за {year} год")
 
+
 class AppsDetailView(DetailView):
     model = App
     template_name = 'main/app_detail.html'
@@ -150,7 +159,10 @@ class AppsDetailView(DetailView):
         ).exclude(
             id=app.id
         )[:3]
-        context['form'] = ReviewForm()
+        form = ReviewForm()
+        if self.request.user.is_authenticated and 'username' in form.fields:
+            form.fields.pop('username')
+        context['form'] = form
         context['reviews'] = app.review_set.order_by('-created_at')
         return context
 
@@ -158,16 +170,20 @@ class AppsDetailView(DetailView):
 @require_POST
 def add_review(request, app_id):
     app = get_object_or_404(App, id=app_id)
-    form = ReviewForm(request.POST)
+    data = request.POST.copy()
+    if request.user.is_authenticated:
+        data['username'] = request.user.username
+    form = ReviewForm(data)
+
     if form.is_valid():
         review = form.save(commit=False)
         review.app = app
         review.save()
-        return redirect(
-            'main:app_detail',
-            app_id=app.id,
-            slug=app.slug
-        )
+        messages.success(request, 'Отзыв сохранён.')
+        return redirect('main:app_detail',app_id=app.id,slug=app.slug)
+
+    if request.user.is_authenticated and 'username' in form.fields:
+        form.fields.pop('username')
     reviews = app.review_set.order_by('-created_at')
     similar_apps = (
         App.objects.filter(
@@ -182,6 +198,7 @@ def add_review(request, app_id):
         'reviews': reviews,
         'similar_apps': similar_apps,
     })
+
 
 
 def no_category(request):
@@ -252,7 +269,7 @@ class AppsListView(ListView):
 
         return context
 
-
+@login_required
 def add_app(request):
     if request.method == 'POST':
         form = AppForm(request.POST,request.FILES)
@@ -262,3 +279,34 @@ def add_app(request):
     else:
         form = AppForm()
     return render(request, 'main/add_app.html', {'form': form})
+
+
+def register(request):
+    if request.user.is_authenticated:
+        return redirect('main:index')
+
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, f'Добро пожаловать, {user.username}! Аккаунт создан.')
+            return redirect('main:index')
+    else:
+        form = RegisterForm()
+    return render(request, 'main/register.html', {'form': form})
+
+
+class StoreLoginView(LoginView):
+    template_name = 'main/login.html'
+    redirect_authenticated_user = True
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'С возвращением, {self.request.user.username}!')
+        return response
+
+class StoreLogoutView(LogoutView):
+    next_page = reverse_lazy('main:index')
+
+

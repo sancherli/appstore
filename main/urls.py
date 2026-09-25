@@ -30,4 +30,8 @@ urlpatterns = [
 
     path('add-app/', views.add_app, name='add_app'),
     path('api/app/<int:app_id>/',views.api_app_detail,name='api_app_detail'),
+
+    path('register/', views.register, name='register'),
+    path('login/', views.StoreLoginView.as_view(), name='login'),
+    path('logout/', views.StoreLogoutView.as_view(), name='logout'),
 ]

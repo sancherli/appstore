@@ -1,5 +1,6 @@
 from django.db import models
-
+from django.contrib.auth.models import User
+from django.conf import settings
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
@@ -20,7 +21,13 @@ class App(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     downloads = models.PositiveIntegerField(default=0)
     icon = models.ImageField(upload_to='icons/', blank=True)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='apps')
 
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='apps',
+    )
 
     def __str__(self):
         return self.name

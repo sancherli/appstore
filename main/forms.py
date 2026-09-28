@@ -2,7 +2,35 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Review, App
+from django.contrib.auth import get_user_model
 
+
+User = get_user_model()
+
+class AppEditForm(forms.ModelForm):
+    class Meta:
+        model = App
+        fields = [
+            'name',
+            'description',
+            'price',
+            'category',
+            'icon',
+            'author',
+        ]
+        labels = {
+            'name': 'Название',
+            'description': 'Описание',
+            'price': 'Цена',
+            'category': 'Категория',
+            'icon': 'Иконка',
+            'author': 'Автор',
+        }
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if not user or not user.is_superuser:
+            self.fields.pop('author')
 
 
 class ReviewForm(forms.ModelForm):

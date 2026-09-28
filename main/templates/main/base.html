@@ -20,7 +20,9 @@
         <a href="{% url 'main:about' %}">О магазине</a>
         <a href="{% url 'main:free_apps' %}">Бесплатные</a>
         <a href="{% url 'main:paid_apps' %}">Платные</a>
+
         {% if user.is_authenticated %}
+            <a href="{% url 'main:my_apps' %}">Мои приложения</a>
             <a href="{% url 'main:add_app' %}">Добавить приложение</a>
             <span>Вы вошли как <strong>{{ user.username }}</strong></span>
             <form method="post" action="{% url 'main:logout' %}" style="display:inline;">

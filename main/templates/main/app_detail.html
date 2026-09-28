@@ -52,6 +52,20 @@
     {% endif %}
 </p>
 
+    <p>Автор:
+        {% if app.author %}
+            {{ app.author.username }}
+        {% else %}
+            не указан
+        {% endif %}
+    </p>
+
+    {% if user.is_authenticated %}
+        {% if user.is_staff or app.author_id == user.id %}
+            <p><a href="{% url 'main:edit_app' app.id %}">Редактировать</a></p>
+        {% endif %}
+    {% endif %}
+
 <h3>Примерно за те же деньги</h3>
 
 {% for similar in similar_apps %}

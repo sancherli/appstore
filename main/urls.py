@@ -15,12 +15,14 @@ urlpatterns = [
     path('app/<int:app_id>/review/', views.add_review, name='add_review'),
 
     path('new/', views.new, name='new'),
-
     path('no_category/', views.no_category, name='no_category'),
     path('free/<int:category_id>/', views.free_by_category, name='free_by_category'),
     path('cheap/', views.cheap_apps, name='cheap'),
     path('free/',views.AppsListView.as_view(),{'is_free': True},name='free'),
     path('paid-apps/', views.AppsListView.as_view(), {'is_free': False}, name='paid_apps'),
+    path('app/<int:app_id>/edit/', views.edit_apps, name='edit_app'),
+    path('my-apps/', views.my_apps, name='my_apps'),
+
     path('app/<int:app_id>/<slug:slug>/',views.AppDetailView.as_view(),name='app_detail'),
 
     path('archive/<yyyy:year>/', views.archive_year, name='archive'),

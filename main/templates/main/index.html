@@ -39,9 +39,18 @@
                 {{ app.price }} $
             {% endif %}
         {% empty %}
-        <li>Приложений пока нет</li>
+    <li>Приложений пока нет</li>
         {% endfor %}
         </li>
+
+        <p>Автор:
+        {% if app.author %}
+            {{ app.author.username }}
+        {% else %}
+            не указан
+        {% endif %}
+        </p>
+
     </ul>
 
     <p>

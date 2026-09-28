@@ -16,7 +16,9 @@ from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import App, Category, Review
-from .forms import ReviewForm, AppForm, RegisterForm
+from .forms import ReviewForm, AppForm, RegisterForm, AppEditForm
+from django.http import HttpResponseForbidden
+
 
 SORTS = {
     'new': '-created_at',
@@ -63,7 +65,7 @@ def index(request):
         apps = App.objects.filter(Q(name__icontains=q) | Q(description__icontains=q))
     else:
         apps = App.objects.all()
-    apps = apps.order_by(SORTS.get(sort, '-created_at'))
+    apps = apps.select_related('author').order_by(SORTS.get(sort, '-created_at'))
     featured = App.objects.order_by('-price').first()
     categories = Category.objects.all()
     paginator = Paginator(apps, 3)
@@ -269,16 +271,21 @@ class AppsListView(ListView):
 
         return context
 
+
 @login_required
 def add_app(request):
     if request.method == 'POST':
-        form = AppForm(request.POST,request.FILES)
+        form = AppForm(request.POST, request.FILES)
         if form.is_valid():
-            app = form.save()
-            return redirect('main:app_detail',app_id=app.id,slug=app.slug)
+            app = form.save(commit=False)
+            app.author = request.user
+            app.save()
+            messages.success(request, f'Приложение «{app.name}» опубликовано.')
+            return redirect('main:app_detail', app_id=app.id)
     else:
         form = AppForm()
     return render(request, 'main/add_app.html', {'form': form})
+
 
 
 def register(request):
@@ -310,3 +317,64 @@ class StoreLogoutView(LogoutView):
     next_page = reverse_lazy('main:index')
 
 
+@login_required
+def my_apps(request):
+    apps = App.objects.filter(author=request.user).order_by('-created_at')
+    return render(request, 'main/my_apps.html', {'apps': apps})
+
+
+
+@login_required
+def edit_apps(request, app_id):
+    app = get_object_or_404(App, id=app_id)
+    if not request.user.is_staff and app.author_id != request.user.id:
+        messages.error(request, 'Редактировать карточку может только её автор.')
+        return redirect('main:app_detail',app_id=app.id,slug=app.slug)
+
+    if request.method == 'POST':
+        form = AppForm(request.POST, request.FILES, instance=app)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Карточка «{app.name}» обновлена.')
+            return redirect('main:app_detail',app_id=app.id,slug=app.slug)
+    else:
+        form = AppForm(instance=app)
+    return render(request, 'main/edit_app.html', {'form': form, 'app': app})
+
+
+
+@login_required
+def edit_apps(request, app_id):
+    app = get_object_or_404(App, id=app_id)
+    if not request.user.is_superuser and app.author != request.user:
+        return HttpResponseForbidden(
+            'Вы можете редактировать только свои приложения.'
+        )
+    if request.method == 'POST':
+        form = AppEditForm(
+            request.POST,
+            request.FILES,
+            instance=app,
+            user=request.user,
+        )
+        if form.is_valid():
+            app = form.save()
+
+            return redirect(
+                'main:app_detail',
+                app_id=app.id,
+                slug=app.slug,
+            )
+    else:
+        form = AppEditForm(
+            instance=app,
+            user=request.user,
+        )
+    return render(
+        request,
+        'main/edit_app.html',
+        {
+            'form': form,
+            'app': app,
+        }
+    )

@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Мои приложения - AppStore{% endblock %}
+
+{% block content %}
+    <h2>Мои приложения</h2>
+    <p>Карточки, которые опубликовали вы, {{ user.username }}.</p>
+
+    <ul>
+        {% for app in apps %}
+            <li>
+                <a href="{% url 'main:app_detail' apps.id %}">{{ apps.name }}</a>
+                —
+                {% if app.price == 0 %}Бесплатно{% else %}{{ app.price }} ${% endif %}
+            </li>
+                — <a href="{% url 'main:edit_app' app.id %}">Редактировать</a>
+        {% empty %}
+            <li>Вы ещё не публиковали приложения. <a href="{% url 'main:add_apps' %}">Добавить первое</a>.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -55,6 +55,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'appstore.urls'
 
+AUTHENTICATION_BACKENDS = [
+    'main.backends.EmailOrUsernameBackend',
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -133,3 +137,5 @@ LOGIN_URL = 'main:login'
 LOGIN_REDIRECT_URL = 'main:index'
 LOGOUT_REDIRECT_URL = 'main:index'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+DEFAULT_FROM_EMAIL = 'store@appstore.local'

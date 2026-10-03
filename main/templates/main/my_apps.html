@@ -9,13 +9,13 @@
     <ul>
         {% for app in apps %}
             <li>
-                <a href="{% url 'main:app_detail' apps.id %}">{{ apps.name }}</a>
+                <a href="{% url 'main:app_detail' app.id app.slug %}">{{ apps.name }}</a>
                 —
                 {% if app.price == 0 %}Бесплатно{% else %}{{ app.price }} ${% endif %}
             </li>
                 — <a href="{% url 'main:edit_app' app.id %}">Редактировать</a>
         {% empty %}
-            <li>Вы ещё не публиковали приложения. <a href="{% url 'main:add_apps' %}">Добавить первое</a>.</li>
+            <li>Вы ещё не публиковали приложения. <a href="{% url 'main:add_app' %}">Добавить первое</a>.</li>
         {% endfor %}
     </ul>
 {% endblock %}

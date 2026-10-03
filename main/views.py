@@ -10,13 +10,21 @@ from django.views.generic import TemplateView, ListView, DetailView
 
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import (
+    LoginView,
+    LogoutView,
+    PasswordResetView,
+    PasswordResetDoneView,
+    PasswordResetConfirmView,
+    PasswordResetCompleteView,
+)
+
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import App, Category, Review
-from .forms import ReviewForm, AppForm, RegisterForm, AppEditForm
+from .forms import ReviewForm, AppForm, RegisterForm, AppEditForm, ForSuperUserEditAppForm
 from django.http import HttpResponseForbidden
 
 
@@ -342,39 +350,60 @@ def edit_apps(request, app_id):
     return render(request, 'main/edit_app.html', {'form': form, 'app': app})
 
 
-
 @login_required
 def edit_apps(request, app_id):
     app = get_object_or_404(App, id=app_id)
-    if not request.user.is_superuser and app.author != request.user:
-        return HttpResponseForbidden(
-            'Вы можете редактировать только свои приложения.'
-        )
+    if not (
+        request.user.has_perm('main.change_app')
+        or request.user.is_staff
+        or app.author_id == request.user.id
+    ):
+        messages.error(request,'Редактировать карточку может только её автор.')
+        return redirect('main:app_detail',app_id=app.id,slug=app.slug,)
     if request.method == 'POST':
-        form = AppEditForm(
-            request.POST,
-            request.FILES,
-            instance=app,
-            user=request.user,
-        )
+        if request.user.is_superuser:
+            form = ForSuperUserEditAppForm(request.POST,request.FILES,instance=app,)
+        else:
+            form = AppForm(request.POST,request.FILES,instance=app,)
         if form.is_valid():
             app = form.save()
-
-            return redirect(
-                'main:app_detail',
-                app_id=app.id,
-                slug=app.slug,
-            )
+            messages.success(request,f'Карточка приложения {app.name} изменена')
+            return redirect('main:app_detail',app_id=app.id,slug=app.slug,)
     else:
-        form = AppEditForm(
-            instance=app,
-            user=request.user,
-        )
-    return render(
-        request,
-        'main/edit_app.html',
-        {
-            'form': form,
-            'app': app,
-        }
-    )
+        if request.user.is_superuser:
+            form = ForSuperUserEditAppForm(instance=app)
+        else:
+            form = AppForm(instance=app)
+    return render(request,'main/edit_app.html',{'form': form,'app': app,})
+
+class StorePasswordResetView(PasswordResetView):
+    template_name = 'main/password_reset_form.html'
+    email_template_name = 'main/password_reset_email.html'
+    subject_template_name = 'main/password_reset_subject.txt'
+    success_url = reverse_lazy('main:password_reset_done')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['email'].label = 'Электронная почта'
+        return form
+
+
+class StorePasswordResetDoneView(PasswordResetDoneView):
+    template_name = 'main/password_reset_done.html'
+
+
+class StorePasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'main/password_reset_confirm.html'
+    success_url = reverse_lazy('main:password_reset_complete')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        if form is not None and 'new_password1' in form.fields:
+            form.fields['new_password1'].label = 'Новый пароль'
+            form.fields['new_password2'].label = 'Повтор пароля'
+        return form
+
+
+class StorePasswordResetCompleteView(PasswordResetCompleteView):
+    template_name = 'main/password_reset_complete.html'
+

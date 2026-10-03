@@ -15,8 +15,7 @@
 
     <p>
         Нет аккаунта?
-        <a href="{% url 'main:register' %}">
-            Зарегистрироваться
-        </a>
+        <a href="{% url 'main:register' %}">Зарегистрироваться</a>
+        <p><a href="{% url 'main:password_reset' %}">Забыли пароль?</a></p>
     </p>
 {% endblock %}

@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from .models import Review, App
 from django.contrib.auth import get_user_model
 
-
 User = get_user_model()
 
 class AppEditForm(forms.ModelForm):
@@ -78,9 +77,11 @@ class AppForm(forms.ModelForm):
         }
 
 class RegisterForm(UserCreationForm):
+    email = forms.EmailField(label='Электронная почта')
+
     class Meta:
         model = User
-        fields = ['username', 'password1', 'password2']
+        fields = ['username', 'email', 'password1', 'password2']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,4 +89,21 @@ class RegisterForm(UserCreationForm):
         self.fields['password1'].label = 'Пароль'
         self.fields['password2'].label = 'Повтор пароля'
 
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Аккаунт с такой почтой уже есть.')
+        return email
 
+
+class ForSuperUserEditAppForm(forms.ModelForm):
+    class Meta:
+        model = App
+        fields = [
+            'name',
+            'description',
+            'price',
+            'category',
+            'icon',
+            'author',
+        ]

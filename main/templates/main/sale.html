@@ -1,0 +1,15 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Распродажа - AppStore{% endblock %}
+
+{% block content %}
+    <h2>Распродажа</h2>
+
+    <p>Платных приложений сейчас: {{ paid_count }}.</p>
+    <p>Кнопка снижает цену каждого платного приложения на 10%. Бесплатные не меняются. Повторное нажатие снижает цену ещё раз.</p>
+
+    <form method="post" action="{% url 'main:sale' %}">
+        {% csrf_token %}
+        <button type="submit">Снизить цены на 10%</button>
+    </form>
+{% endblock %}

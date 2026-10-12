@@ -1,0 +1,22 @@
+{% extends 'main/base.html' %}
+
+{% block title %}{{ title }} - AppStore{% endblock %}
+
+{% block content %}
+    <h2>{{ title }}</h2>
+
+    <ul>
+        {% for app in apps %}
+        <li><strong><a href="{% url 'main:app_detail' app.id %}">{{ app.name }}</a></strong> - {{ app.category }}<br>
+            {{ app.description|truncatechars:60 }}<br>
+            {% if app.price == 0 %}
+                Бесплатно
+            {% else %}
+                {{ app.price }} $
+            {% endif %}
+        </li>
+        {% empty %}
+        <li>Приложений пока нет</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

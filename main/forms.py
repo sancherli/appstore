@@ -1,47 +1,19 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+
 from .models import Review, App
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
-
-class AppEditForm(forms.ModelForm):
-    class Meta:
-        model = App
-        fields = [
-            'name',
-            'description',
-            'price',
-            'category',
-            'icon',
-            'author',
-        ]
-        labels = {
-            'name': 'Название',
-            'description': 'Описание',
-            'price': 'Цена',
-            'category': 'Категория',
-            'icon': 'Иконка',
-            'author': 'Автор',
-        }
-    def __init__(self, *args, user=None, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if not user or not user.is_superuser:
-            self.fields.pop('author')
 
 
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ['username', 'comment', 'stars', 'rating', 'recommended']
+        fields = ['username', 'comment', 'stars', 'recommended']
         labels = {
-            'username': 'Your name',
-            'comment': 'Text here',
-            'stars': 'Mark',
-            'rating': 'Rating',
-            'recommended': 'Do you recommended this app'
+            'username': 'Ваше имя',
+            'comment': 'Комментарий',
+            'stars': 'Оценка (1–5)',
+            'recommended': 'Рекомендую это приложение',
         }
         widgets = {
             'username': forms.TextInput(attrs={
@@ -49,7 +21,7 @@ class ReviewForm(forms.ModelForm):
             }),
             'comment': forms.Textarea(attrs={
                 'rows': 3,
-                'placeholder': 'Что вам понравилось или не понравилось',
+                'placeholder': 'Что понравилось или не понравилось?',
             }),
             'stars': forms.NumberInput(attrs={
                 'min': 1,
@@ -60,7 +32,7 @@ class ReviewForm(forms.ModelForm):
     def clean_stars(self):
         stars = self.cleaned_data['stars']
         if stars < 1 or stars > 5:
-            raise forms.ValidationError('Оценка должна быть от 1 до 5')
+            raise forms.ValidationError('Оценка должна быть от 1 до 5.')
         return stars
 
 
@@ -71,13 +43,23 @@ class AppForm(forms.ModelForm):
         labels = {
             'name': 'Название',
             'description': 'Описание',
-            'price': 'Цена (0 = бесплатно)',
+            'price': 'Цена',
             'category': 'Категория',
             'icon': 'Иконка',
         }
 
+
+class ForSuperUserEditAppForm(AppForm):
+    class Meta(AppForm.Meta):
+        fields = ['name', 'description', 'price', 'category', 'icon', 'author']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['author'].label = 'Автор'
+
+
 class RegisterForm(UserCreationForm):
-    email = forms.EmailField(label='Электронная почта')
+    email = forms.EmailField(label="Электронная почта")
 
     class Meta:
         model = User
@@ -85,25 +67,12 @@ class RegisterForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['username'].label = 'Имя пользователя'
-        self.fields['password1'].label = 'Пароль'
-        self.fields['password2'].label = 'Повтор пароля'
+        self.fields['username'].label = "Имя пользователя"
+        self.fields['password1'].label = "Пароль"
+        self.fields['password2'].label = "Повтор пароля"
 
     def clean_email(self):
         email = self.cleaned_data['email'].strip().lower()
         if User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError('Аккаунт с такой почтой уже есть.')
+            raise forms.ValidationError('Аккаунт с такой почтой уже существует')
         return email
-
-
-class ForSuperUserEditAppForm(forms.ModelForm):
-    class Meta:
-        model = App
-        fields = [
-            'name',
-            'description',
-            'price',
-            'category',
-            'icon',
-            'author',
-        ]

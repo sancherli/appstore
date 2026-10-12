@@ -4,18 +4,20 @@
 
 {% block content %}
     <h2>Мои приложения</h2>
-    <p>Карточки, которые опубликовали вы, {{ user.username }}.</p>
+
+    <p>Приложения, которые опубликовали вы, {{ user.username }}</p>
 
     <ul>
         {% for app in apps %}
             <li>
-                <a href="{% url 'main:app_detail' app.id app.slug %}">{{ apps.name }}</a>
-                —
-                {% if app.price == 0 %}Бесплатно{% else %}{{ app.price }} ${% endif %}
+                <a href="{% url 'main:app_detail' app.id %}">{{ app.name }}</a>
+                --
+                {% if app.price == 0 %} Бесплатно {% else %} {{ app.price }} $ {% endif %}
+                --
+                <a href="{% url 'main:edit_app' app.id %}">Редактировать</a>
             </li>
-                — <a href="{% url 'main:edit_app' app.id %}">Редактировать</a>
         {% empty %}
-            <li>Вы ещё не публиковали приложения. <a href="{% url 'main:add_app' %}">Добавить первое</a>.</li>
+            <li>Вы ещё не публиковали приложения. <a href="{% url 'main:add_app' %}">Добавить первое приложение</a></li>
         {% endfor %}
     </ul>
 {% endblock %}

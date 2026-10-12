@@ -5,17 +5,15 @@
 {% block content %}
     <h2>Вход</h2>
 
-    <p>Войдите, чтобы добавлять приложения и отзывы от своего имени.</p>
+    <p>Войдите, чтобы добавлять приложения и отзывы от своего имени</p>
 
     <form method="post" action="{% url 'main:login' %}">
         {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
         {{ form.as_p }}
         <button type="submit">Войти</button>
     </form>
 
-    <p>
-        Нет аккаунта?
-        <a href="{% url 'main:register' %}">Зарегистрироваться</a>
-        <p><a href="{% url 'main:password_reset' %}">Забыли пароль?</a></p>
-    </p>
+    <p>Нет аккаунта? > <a href="{% url 'main:register' %}">Зарегистрироваться</a></p>
+    <p><a href="{% url 'main:password_reset' %}">Забыли пароль?</a></p>
 {% endblock %}

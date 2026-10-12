@@ -4,12 +4,12 @@
 
 {% block content %}
     <h2>Добавить приложение</h2>
-    <p>Заполните карточку и при желании загрузите иконку — она появится в каталоге.</p>
+
+    <p>Заполните карточку товара, чтобы добавить приложение</p>
 
     <form method="post" action="{% url 'main:add_app' %}" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Опубликовать</button>
+        <button type="submit">Опубликовать приложение</button>
     </form>
-
 {% endblock %}

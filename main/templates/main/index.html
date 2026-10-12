@@ -3,18 +3,14 @@
 {% block title %}Главная - AppStore{% endblock %}
 
 {% block content %}
-
-{% if featured %}
-    <p>
-        Приложение дня:
-        <a href="{% url 'main:app_detail' featured.id featured.slug %}">
-            {{ featured.name }}
-        </a>
-        {% if featured.icon %}
-            <img src="{{ featured.icon.url }}" alt="" class="app-icon">
-        {% endif %}
-    </p>
-{% endif %}
+    {% if featured %}
+        <p>Приложение дня:
+            {% if featured.icon %}
+                <img src="{{ featured.icon.url }}" alt="" class="app-icon">
+            {% endif %}
+            <strong><a href="{{ featured.get_absolute_url }}">{{ featured.name }}</a></strong>
+        </p>
+    {% endif %}
 
     <h2>Приложения в магазине</h2>
 
@@ -23,34 +19,41 @@
         <a href="?sort=name{% if q %}&q={{ q }}{% endif %}">по названию</a>
         <a href="?sort=price{% if q %}&q={{ q }}{% endif %}">сначала дешёвые</a>
         <a href="?sort=expensive{% if q %}&q={{ q }}{% endif %}">сначала дорогие</a>
+        <a href="?sort=rating{% if q %}&q={{ q }}{% endif %}">сначала лучшие</a>
     </p>
 
     <ul>
         {% for app in page_obj %}
         <li>
             {% if app.icon %}
-                <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="app-icon">
+                <img src="{{ app.icon.url }}" alt="" class="app-icon">
             {% endif %}
-            <strong><a href="{% url 'main:app_detail' app.id app.slug %}">{{ app.name }}</a></strong> - {{ app.category }}<br>
+            <strong><a href="{{ app.get_absolute_url }}">{{ app.name }}</a></strong> - {{ app.category }}<br>
             {{ app.description|truncatechars:60 }}<br>
+            {{ app.price_label }}
             {% if app.price == 0 %}
                 Бесплатно
             {% else %}
                 {{ app.price }} $
             {% endif %}
-        {% empty %}
-    <li>Приложений пока нет</li>
-        {% endfor %}
+           —
+            {% if app.rating_count %}
+                оценка {{ app.rating_avg }} ({{ app.rating_count }})
+            {% else %}
+                нет оценок
+            {% endif %}
+
+            <p>Автор:
+                {% if app.author %}
+                    {{ app.author.username }}
+                {% else %}
+                    не указан
+                {% endif %}<br>
+            </p>
         </li>
-
-        <p>Автор:
-        {% if app.author %}
-            {{ app.author.username }}
-        {% else %}
-            не указан
-        {% endif %}
-        </p>
-
+        {% empty %}
+        <li>Приложений пока нет</li>
+        {% endfor %}
     </ul>
 
     <p>
@@ -70,5 +73,4 @@
     </p>
 
     <p>Всего приложений на странице: {{ page_obj|length }}</p>
-
 {% endblock %}

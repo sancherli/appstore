@@ -4,14 +4,14 @@
 
 {% block content %}
     <h2>Регистрация</h2>
-    <p>Создайте аккаунт, чтобы публиковать приложения в магазине.</p>
+
+    <p>Создайте аккаунт, чтобы публиковать приложения у нас</p>
 
     <form method="post" action="{% url 'main:register' %}">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Зарегистрироваться</button>
+        <button type="submit">Регистрация</button>
     </form>
 
-    <p>Уже есть аккаунт? <a href="{% url 'main:login' %}">Войти</a></p>
+    <p>Уже есть аккаунт? > <a href="{% url 'main:login' %}">Войти</a></p>
 {% endblock %}
-

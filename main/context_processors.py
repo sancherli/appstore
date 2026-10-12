@@ -1,6 +1,6 @@
 from django.db.models import Count
-from django.http import request
-from .models import Category, App, Review
+
+from .models import App, Category
 
 
 def store_menu(request):
@@ -9,10 +9,12 @@ def store_menu(request):
         .annotate(apps_count=Count('app'))
         .order_by('name')
     )
-
+    favorites_count = 0
+    if request.user.is_authenticated:
+        favorites_count = request.user.favorite_apps.count()
     return {
-        'categories': Category.objects.all(),
-        'category_total': Category.objects.count(),
+        'categories': categories,
         'apps_total': App.objects.count(),
-        'reviews_total': Review.objects.count(),
+        'categories_total': len(categories),
+        'favorites_count': favorites_count,
     }

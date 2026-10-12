@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 
-from django.conf.global_settings import MEDIA_ROOT, MEDIA_URL, LOGIN_URL
+from django.conf.global_settings import MEDIA_URL, LOGIN_URL, LOGIN_REDIRECT_URL, EMAIL_BACKEND, DEFAULT_FROM_EMAIL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -54,10 +54,6 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'appstore.urls'
-
-AUTHENTICATION_BACKENDS = [
-    'main.backends.EmailOrUsernameBackend',
-]
 
 TEMPLATES = [
     {
@@ -125,7 +121,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
@@ -137,5 +133,5 @@ LOGIN_URL = 'main:login'
 LOGIN_REDIRECT_URL = 'main:index'
 LOGOUT_REDIRECT_URL = 'main:index'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'store@appstore.local'

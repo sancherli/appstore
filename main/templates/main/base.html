@@ -1,20 +1,14 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>
-        {% block title %}App Store{% endblock %}
-    </title>
     <link rel="stylesheet" href="{% static 'main/style.css' %}">
+    <title>{% block title %}AppStore{% endblock %}</title>
 </head>
-
 <body>
-    {% include 'main/includes/categories_nav.html' %}
     <h1>AppStore</h1>
-
-  <nav>
+    <nav>
         <a href="{% url 'main:index' %}">Главная</a>
         <a href="{% url 'main:new' %}">Новые приложения</a>
         <a href="{% url 'main:about' %}">О магазине</a>
@@ -22,8 +16,13 @@
         <a href="{% url 'main:paid_apps' %}">Платные</a>
 
         {% if user.is_authenticated %}
+            {% if user.is_staff %}
+                <a href="{% url 'main:sale' %}">Распродажа</a>
+            {% endif %}
+
             <a href="{% url 'main:my_apps' %}">Мои приложения</a>
             <a href="{% url 'main:add_app' %}">Добавить приложение</a>
+            <a href="{% url 'main:favorites' %}">Избранное ({{ favorites_count }})</a>
             <span>Вы вошли как <strong>{{ user.username }}</strong></span>
             <form method="post" action="{% url 'main:logout' %}" style="display:inline;">
                 {% csrf_token %}
@@ -31,7 +30,7 @@
             </form>
         {% else %}
             <a href="{% url 'main:login' %}">Войти</a>
-            <a href="{% url 'main:register' %}">Регистрация</a>
+            <a href="{% url 'main:register' %}">Зарегистрироваться</a>
         {% endif %}
     </nav>
 
@@ -43,35 +42,31 @@
         </ul>
     {% endif %}
 
+    <p class="categories-nav">
+        Категории:
+        {% for category in categories %}
+            <a href="{% url 'main:category' category.id %}"
+               {% if request.resolver_match.url_name == 'category' and request.resolver_match.kwargs.category_id == category.id %}class="active"{% endif %}>
+                {{ category.name }}
+            </a>
+            ({{ category.apps_count }}){% if not forloop.last %} · {% endif %}
+        {% empty %}
+            пока нет
+        {% endfor %}
+    </p>
 
     <form method="GET" action="{% url 'main:index' %}">
-        <input
-            type="text"
-            name="q"
-            placeholder="Поиск приложений..."
-            value="{{ q }}"
-        >
+        <input type="text" name="q" placeholder="Поиск приложений..." value="{{ q }}">
         {% if request.GET.sort %}
-            <input
-                type="hidden"
-                name="sort"
-                value="{{ request.GET.sort }}"
-            >
+            <input type="hidden" name="sort" value="{{ request.GET.sort }}">
         {% endif %}
-
         <button type="submit">Найти</button>
     </form>
 
     {% block content %}{% endblock %}
 
-    <p>Пользователь {{ user }}/ сделан ли вход {{ user.is_authenticated}}</p>
-
-<footer>
-    Всего на сайте:
-    категорий {{ category_total }},
-    приложений {{ apps_total }},
-    отзывов {{ reviews_total }}
-</footer>
-
+    <footer>
+        Всего на сайте: категорий {{ categories_total }} и {{ apps_total }} приложений
+    </footer>
 </body>
 </html>

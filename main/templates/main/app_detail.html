@@ -16,7 +16,7 @@
 
     <p>Категория:
         {% if app.category %}
-             <a href="{% url 'main:category' app.category.id %}">{{ app.category}}</a>
+    <a href="{{ app.category.get_absolute_url }}">{{ app.category.name }}
         {% else %}
             Без категории
         {% endif %}

@@ -344,3 +344,10 @@ def sale(request):
 
     paid_count = App.objects.filter(price__gt=0).count()
     return render(request, 'main/sale.html', {'paid_count': paid_count})
+
+
+def menu(request):
+    categories = Category.objects.filter(is_visible=True)
+    return {
+        'categories': categories,
+    }

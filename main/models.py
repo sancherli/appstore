@@ -14,9 +14,16 @@ def validate_not_negative_price(value):
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    is_visible = models.BooleanField(default=True)
 
     def __str__(self):
        return self.name
+
+    def get_absolute_url(self):
+        return reverse(
+            'main:category',
+            kwargs={'category_id': self.id}
+        )
 
     class Meta:
         verbose_name = 'Категории'

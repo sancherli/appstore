@@ -4,8 +4,9 @@ from math import factorial
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.db import models
+from django.db import models, transaction
 from django.urls import reverse
+
 
 def validate_not_negative_price(value):
     if value < 0:
@@ -30,6 +31,33 @@ class Category(models.Model):
         verbose_name_plural = 'Категории'
 
 
+class AppQuerySet(models.QuerySet):
+    def free(self):
+        return self.filter(price=0)
+
+    def paid(self):
+        return self.filter(price__gt=0)
+
+    def cheap(self):
+        return self.filter(price__lt=100).order_by('-price')
+
+    def newest(self):
+        return self.order_by('-created_at')
+
+    def in_category(self, category):
+        return self.filter(category=category)
+
+
+class AppManager(models.Manager.from_queryset(AppQuerySet)):
+    def move_to_category(self,source,target):
+        if source.pk is None or target.pk is None or source.pk == target.pk:
+            raise ValueError("Нельзя перенести приложение в ту же категорию")
+        with transaction.atomic():
+            moved = self.model.objects.in_category(source).uodate(category=target)
+            source.delete()
+        return moved
+
+
 class App(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -41,6 +69,8 @@ class App(models.Model):
     favorited_by = models.ManyToManyField(User, related_name='favorite_apps', blank=True, verbose_name='В избранном у')
     rating_avg = models.DecimalField(max_digits=2,decimal_places=1,default=0,editable=False,verbose_name='Средняя оценка',)
     rating_count = models.PositiveIntegerField(default=0,editable=False,verbose_name='Число оценок',)
+
+    objects = AppManager()
 
     def __str__(self):
         return self.name
@@ -64,7 +94,7 @@ class App(models.Model):
         if type(percent) is not int or not 1 <= percent <= 90:
             raise ValueError('Скидка должна быть целым числом от 1 до 90.')
         factor = (Decimal(100) - Decimal(percent)) / Decimal(100)
-        paid = list(cls.objects.filter(price__gt=0))
+        paid = list(cls.objects.paid())
         for app in paid:
             app.price = (app.price * factor).quantize(
                 Decimal('0.01'),
@@ -94,3 +124,6 @@ class Review(models.Model):
 
     def __str__(self):
         return f'{self.username} → {self.app.name}'
+
+
+

@@ -33,4 +33,7 @@ urlpatterns = [
     path('app/<int:app_id>/favorite/', views.toggle_favorite, name='toggle_favorite'),
 
     path('sale/', views.sale, name='sale'),
+
+    path('category/<int:category_id>/close/', views.close_category, name='close_category'),
+
 ]

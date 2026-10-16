@@ -7,6 +7,10 @@
 
     <h2>Категория: {{ category.name }}</h2>
 
+    {% if user.is_staff %}
+        <p><a href="{% url 'main:close_category' category.id %}">Закрыть категорию</a></p>
+    {% endif %}
+
     <ul>
         {% for app in apps %}
             <li><strong><a href="{% url 'main:app_detail' app.id %}">{{ app.name }}</a> -

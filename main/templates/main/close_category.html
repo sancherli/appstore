@@ -1,0 +1,26 @@
+{% extends 'main/base.html' %}
+
+{% block title %}Закрыть категорию - AppStore{% endblock %}
+
+{% block content %}
+    <h2>Закрыть категорию «{{ source.name }}»</h2>
+
+    <p>В ней приложений: {{ apps_count }}.</p>
+    <p>Карточки переедут в выбранную категорию вместе с ценой, автором, оценкой, отзывами и избранным. Затем эта категория исчезнет. Повторно закрыть её уже нельзя: адреса не будет.</p>
+
+    {% if targets %}
+        <form method="post" action="{% url 'main:close_category' source.pk %}">
+            {% csrf_token %}
+            <label for="target_id">Куда перенести?</label>
+            <select id="target_id" name="target_id">
+                {% for category in targets %}
+                    <option value="{{ category.pk }}">{{ category.name }} (№ {{ category.pk }})</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Перенести и закрыть</button>
+        </form>
+    {% else %}
+        <p>Другой категории пока нет. Создайте её в админке. Эта страница последнюю категорию не удалит: карточкам некуда переехать, а удаление категории стирает приложения.</p>
+    {% endif %}
+{% endblock %}
+

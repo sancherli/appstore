@@ -53,6 +53,25 @@
         <p><a href="{% url 'main:login' %}?next={{ request.path }}">Войдите</a> чтобы сохранить приложение</p>
     {% endif %}
 
+
+    {% if purchase %}
+        <p>Приложение у вас с {{ purchase.purchased_at|date:"d.m.Y" }}. Уплачено: {{ purchase.price_label }}</p>
+    {% elif user.is_authenticated and app.author_id == user.id %}
+        <p>Это ваше приложение, покупать его не нужно.</p>
+    {% elif user.is_authenticated %}
+        <form method="post" action="{% url 'main:buy_app' app.id %}">
+            {% csrf_token %}
+            {% if app.price == 0 %}
+                <button type="submit">Установить бесплатно</button>
+            {% else %}
+                <button type="submit">Купить за {{ app.price }} $</button>
+            {% endif %}
+        </form>
+    {% else %}
+        <p><a href="{% url 'main:login' %}?next={{ request.path }}">Войдите</a>, чтобы купить приложение</p>
+    {% endif %}
+
+
     {% if user.is_authenticated %}
         {% if perms.main.change_app or user.is_staff or app.author_id == user.id %}
             <p><a href="{% url 'main:edit_app' app.id %}">Редактировать</a></p>

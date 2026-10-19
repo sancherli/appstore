@@ -21,6 +21,7 @@
             {% endif %}
 
             <a href="{% url 'main:my_apps' %}">Мои приложения</a>
+            <a href="{% url 'main:purchases' %}">Мои покупки</a>
             <a href="{% url 'main:add_app' %}">Добавить приложение</a>
             <a href="{% url 'main:favorites' %}">Избранное ({{ favorites_count }})</a>
             <span>Вы вошли как <strong>{{ user.username }}</strong></span>

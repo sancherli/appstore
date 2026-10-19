@@ -1,6 +1,8 @@
+from http.client import responses
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_GET, require_POST
 from django.contrib.auth import login
@@ -18,7 +20,7 @@ from django.urls import reverse_lazy, reverse
 
 from django.views.generic import TemplateView, ListView, DetailView
 
-from .models import App, Category
+from .models import App, Category, Review, Purchase
 from .forms import ReviewForm, AppForm, RegisterForm, ForSuperUserEditAppForm
 
 SORTS = {
@@ -57,6 +59,7 @@ def index(request):
         'featured': featured,
     })
 
+
 # @require_GET
 # def about(request):
 #     return render(request, 'main/about.html')
@@ -87,9 +90,10 @@ class AppDetailView(DetailView):
         context['form'] = form
         context['reviews'] = app.review_set.order_by('-created_at')
         context['is_favorite'] = (
-            self.request.user.is_authenticated
-            and app.favorited_by.filter(pk=self.request.user.pk).exists()
+                self.request.user.is_authenticated
+                and app.favorited_by.filter(pk=self.request.user.pk).exists()
         )
+        context['purchase'] = app.purchase_of(self.request.user)
         return context
 
 
@@ -118,13 +122,14 @@ def add_review(request, app_id):
         'reviews': reviews,
         'similar_apps': similar_apps,
         'is_favorite': request.user.is_authenticated
-                       and app.favorited_by.filter(pk=request.user.pk).exists()
+                       and app.favorited_by.filter(pk=request.user.pk).exists(),
+        'purchase': app.purchase_of(request.user),
     })
 
 
 def category_detail(request, category_id):
     category = get_object_or_404(Category, id=category_id)
-    apps = App.objects.filter(category=category)
+    apps = App.objects.filter(category=category).defer('description')
     return render(request, 'main/category.html', {
         'category': category,
         'apps': apps,
@@ -144,6 +149,7 @@ class NewAppView(ListView):
 
     def get_queryset(self):
         return App.objects.newest()
+
 
 # def apps_list(request, is_free):
 #     if is_free:
@@ -244,9 +250,9 @@ def my_apps(request):
 def edit_app(request, app_id):
     app = get_object_or_404(App, id=app_id)
     if not (
-        request.user.has_perm('main.change_app')
-        or request.user.is_staff
-        or app.author_id == request.user.id
+            request.user.has_perm('main.change_app')
+            or request.user.is_staff
+            or app.author_id == request.user.id
     ):
         print('1')
         messages.error(request, 'Редактировать карточку приложения может только его автор!')
@@ -315,7 +321,7 @@ def toggle_favorite(request, app_id):
 
     if not request.user.is_authenticated:
         login_url = reverse('main:login')
-        next_url = reverse(app.get_absolute_url())
+        next_url = app.get_absolute_url()
         return redirect(f"{login_url}?next={next_url}")
 
     if app.favorited_by.filter(pk=request.user.pk).exists():
@@ -332,48 +338,38 @@ def toggle_favorite(request, app_id):
 @login_required
 def sale(request):
     if not request.user.is_staff:
-        messages.error(request, 'Распродажу запускает только сотрудник магазина.')
+        messages.error(request, 'Распродажу запускает только персонал')
         return redirect('main:index')
 
     if request.method == 'POST':
         updated = App.discount_paid(10)
-        messages.success(
-            request,
-            f'Скидка 10% применена к платным приложениям: {updated}.',
-        )
+        messages.success(request, f'Скидка 10% применена к платным приложениям: {updated}')
         return redirect('main:index')
 
     paid_count = App.objects.paid().count()
     return render(request, 'main/sale.html', {'paid_count': paid_count})
 
 
-def menu(request):
-    categories = Category.objects.filter(is_visible=True)
-    return {
-        'categories': categories,
-    }
-
-
 @login_required
 def close_category(request, category_id):
-    source = get_object_or_404(Category, pk=category_id)
+    source = get_object_or_404(Category, id=category_id)
     if not request.user.is_staff:
-        messages.error(request, 'Категорию закрывает только сотрудник магазина.')
+        messages.error(request, 'Категорию может закрыть только сотрудник магазина')
         return redirect('main:index')
 
     targets = Category.objects.exclude(pk=source.pk).order_by('name')
     if request.method == 'POST':
         raw_target = request.POST.get('target_id', '')
         if not str(raw_target).isdigit():
-            messages.error(request, 'Выберите категорию, в которую перенести приложения.')
+            messages.error(request, 'Выберите категорию в которую перенести приложения')
             return redirect('main:close_category', category_id=source.pk)
-        target = get_object_or_404(Category, pk=int(raw_target))
+        target = get_object_or_404(Category, id=int(raw_target))
         try:
             moved = App.objects.move_to_category(source, target)
         except ValueError as exc:
             messages.error(request, str(exc))
             return redirect('main:close_category', category_id=source.pk)
-        messages.success(request, f'Категория закрыта. Приложений перенесено: {moved}.')
+        messages.success(request, f'Категория закрыта. Перенесены приложения: {moved}')
         return redirect('main:category', category_id=target.pk)
 
     apps_count = App.objects.in_category(source).count()
@@ -381,4 +377,40 @@ def close_category(request, category_id):
         'source': source,
         'targets': targets,
         'apps_count': apps_count,
+    })
+
+
+@require_POST
+def buy_app(request, app_id):
+    app = get_object_or_404(App, id=app_id)
+
+    if not request.user.is_authenticated:
+        login_url = reverse('main:login')
+        return redirect(f"{login_url}?next={app.get_absolute_url()}")
+
+    if app.author_id == request.user.id:
+        messages.error(request, 'Это ваше приложение, покупать его вам не нужно')
+        return redirect(app.get_absolute_url())
+
+    if app.purchase_of(request.user) is not None:
+        messages.info(request, f'{app.name} уже есть в ваших покупках')
+        return redirect(app.get_absolute_url())
+
+    app.buyers.add(request.user, through_defaults={'price_paid': app.price})
+    messages.success(request, f"Покупка оформлена: {app.name}, {app.price_label()}")
+    return redirect(app.get_absolute_url())
+
+
+@login_required
+def purchases(request):
+    items = (
+        Purchase.objects.filter(user=request.user)
+        .select_related('app')
+        .only('price_paid', 'purchased_at', 'app__name', 'app__price')
+        .order_by('-purchased_at')
+    )
+    total = items.aggregate(total=Sum('price_paid'))['total'] or 0
+    return render(request, 'main/purchases.html', {
+        'purchases': items,
+        'total': total,
     })

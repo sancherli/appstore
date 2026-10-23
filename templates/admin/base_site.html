@@ -1,0 +1,7 @@
+{% extends "admin/base_site.html" %}
+
+{% block nav-global %}
+    {% if user.is_staff %}
+        <a href="{% url 'main:sale' %}">Распродажа</a>
+    {% endif %}
+{% endblock %}

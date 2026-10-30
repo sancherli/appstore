@@ -11,6 +11,11 @@
         <p><a href="{% url 'main:close_category' category.id %}">Закрыть категорию</a></p>
     {% endif %}
 
+    <form method="get">
+        {{ from.as.p }}
+        <button type="submit">Подобрать</button>
+    </form>
+
     <ul>
         {% for app in apps %}
             <li><strong><a href="{% url 'main:app_detail' app.id %}">{{ app.name }}</a> -

@@ -62,6 +62,14 @@ class App(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=6, decimal_places=2, default=0, validators=[validate_not_negative_price])
+    price_before_sale =  models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        editable=False,
+        verbose_name='Цена до распродажи',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
     icon = models.ImageField(upload_to='icons/', blank=True)
@@ -108,14 +116,23 @@ class App(models.Model):
         factor = (Decimal(100) - Decimal(percent)) / Decimal(100)
         paid = list(cls.objects.paid())
         for app in paid:
+            if app.price_before_sale is None:
+                app.price_before_sale = app.price
             app.price = (app.price * factor).quantize(
                 Decimal('0.01'),
                 rounding=ROUND_HALF_UP,
             )
-        return cls.objects.bulk_update(paid, ['price'])
+        return cls.objects.bulk_update(paid, ['price', 'price_before_sale'])
+
+    @classmethod
+    def end_sale(cls):
+        return cls.objects.filter(price_before_sale__isnull=False).update(
+            price=models.F('price_before_sale'),
+            price_before_sale=None,
+        )
 
 
-    class Meta:
+class Meta:
         verbose_name = 'Приложение'
         verbose_name_plural = 'Приложения'
 

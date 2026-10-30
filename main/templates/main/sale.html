@@ -12,4 +12,9 @@
         {% csrf_token %}
         <button type="submit">Снизить цены на 10%</button>
     </form>
+
+    <form method="post" action="{% url 'main:sale' %}">
+        {% csrf_token %}
+        <button type="submit" name="end_sale">Завершить распродажу</button>
+    </form>
 {% endblock %}

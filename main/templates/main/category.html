@@ -11,10 +11,18 @@
         <p><a href="{% url 'main:close_category' category.id %}">Закрыть категорию</a></p>
     {% endif %}
 
-    <form method="get">
-        {{ from.as.p }}
-        <button type="submit">Подобрать</button>
-    </form>
+{% if form.non_field_errors %}
+    {{ form.non_field_errors }}
+{% endif %}
+
+<form method="get">
+    Цена от {{ form.price_min }}
+    до {{ form.price_max }}
+    {{ form.sort }}
+
+    <button type="submit">Подобрать</button>
+    <a href="{% url 'main:category_detail' category.id %}">Сбросить</a>
+</form>
 
     <ul>
         {% for app in apps %}

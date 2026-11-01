@@ -31,11 +31,13 @@
             {% endif %}
             <strong><a href="{{ app.get_absolute_url }}">{{ app.name }}</a></strong> - {{ app.category }}<br>
             {{ app.description|truncatechars:60 }}<br>
-            {{ app.price_label }}
             {% if app.price == 0 %}
                 Бесплатно
             {% else %}
                 {{ app.price }} $
+                {% if app.price_before_sale %}
+                    <s>{{ app.price_before_sale }} $</s>
+                {% endif %}
             {% endif %}
            —
            {% if app.rating_count %}

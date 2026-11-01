@@ -1,5 +1,10 @@
 from django.urls import path
 from . import views
+from django.contrib import admin
+from django.urls import path, register_converter
+from .mainapp.converter import YearConverter
+
+register_converter(YearConverter, 'yyyy')
 
 app_name = 'main'
 
@@ -38,4 +43,7 @@ urlpatterns = [
 
     path('app/<int:app_id>/buy/', views.buy_app, name='buy_app'),
     path('purchases/', views.purchases, name='purchases'),
+
+    path('', views.index, name='index'),
+    path('category/<int:category_id>/', views.category_detail, name='category_detail'),
 ]

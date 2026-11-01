@@ -147,6 +147,7 @@ def category_detail(request, category_id):
     })
 
 
+
 # def new(request):
 #     apps = App.objects.order_by('-created_at')[:5]
 #     return render(request, 'main/new.html', {'apps': apps})

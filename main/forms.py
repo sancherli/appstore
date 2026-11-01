@@ -98,3 +98,7 @@ class PriceFilterForm(forms.Form):
         if price_min is not None and price_max is not None and price_min > price_max:
             raise forms.ValidationError('Цена "от" не может быть больше цены "до"')
         return cleaned_data
+
+
+
+

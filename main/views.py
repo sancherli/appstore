@@ -301,7 +301,7 @@ def my_prices(request):
 @require_POST
 def remove_from_sale(request, app_id):
     app = get_object_or_404(App, id=app_id, author=request.user)
-
+    app.price = app.price_before_sale
     app.price_before_sale = None
     app.save()
 

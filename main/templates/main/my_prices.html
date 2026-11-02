@@ -22,7 +22,7 @@
             {{ form.as_p }}
 
         {% empty %}
-            <p>Вы ещё не публиковали приложений</p>
+            <p>Вы ещё не публиковали приложения</p>
         {% endfor %}
 
         <button type="submit">Сохранить</button>
@@ -36,8 +36,6 @@
                     Снять с распродажи — {{ form.instance.name }}
                 </button>
             </form>
-        {% else %}
-            <p>Снято с распродажи</p>
         {% endif %}
     {% endfor %}
 

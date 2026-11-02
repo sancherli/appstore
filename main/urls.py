@@ -1,6 +1,6 @@
-from django.urls import path
+
 from . import views
-from django.contrib import admin
+
 from django.urls import path, register_converter
 from .mainapp.converter import YearConverter
 
@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/app/<int:app_id>/', views.api_app_detail, name='api_app_detail'),
     path('add-app/', views.add_app, name='add_app'),
     path('my-apps/', views.my_apps, name='my_apps'),
+    path('my-apps/prices/', views.my_prices, name='my_prices'),
 
     path('register/', views.register, name='register'),
     path('login/', views.StoreLoginView.as_view(), name='login'),
@@ -38,6 +39,7 @@ urlpatterns = [
     path('app/<int:app_id>/favorite/', views.toggle_favorite, name='toggle_favorite'),
 
     path('sale/', views.sale, name='sale'),
+    path('app/<int:app_id>/remove-from-sale/',views.remove_from_sale,name='remove_from_sale'),
 
     path('category/<int:category_id>/close/', views.close_category, name='close_category'),
 

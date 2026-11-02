@@ -1,4 +1,4 @@
-from http.client import responses
+
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse, HttpResponse
@@ -16,12 +16,17 @@ from django.contrib.auth.views import (
     PasswordResetCompleteView,
 )
 from django.contrib import messages
+
+from django.forms import modelformset_factory
+
 from django.urls import reverse_lazy, reverse
 
 from django.views.generic import TemplateView, ListView, DetailView
 
 from .models import App, Category, Review, Purchase
 from .forms import ReviewForm, AppForm, RegisterForm, ForSuperUserEditAppForm, PriceFilterForm
+
+
 
 SORTS = {
     'new': '-created_at',
@@ -257,6 +262,52 @@ def my_apps(request):
     apps = App.objects.filter(author=request.user).order_by('-created_at')
     return render(request, 'main/my_apps.html', {'apps': apps})
 
+AppPriceFormSet = modelformset_factory(
+    App,
+    fields={'price'},
+    labels={'price':'Цена'},
+    extra=0,
+    edit_only=True,
+)
+
+
+@login_required
+def my_prices(request):
+    apps = App.objects.filter(author=request.user).order_by('name')
+    if request.method == 'POST':
+        formset = AppPriceFormSet(request.POST, queryset=apps)
+        if formset.is_valid():
+            changed_count = 0
+            removed_from_sale = 0
+            for form in formset:
+                if form.has_changed() and 'price' in form.changed_data:
+                    app = form.instance
+                    changed_count += 1
+                    if app.price_before_sale is not None:
+                        removed_from_sale += 1
+                    app.price_before_sale = None
+                    app.save()
+            messages.success(
+                request,
+                f'Изменено карточек: {changed_count}, снято с распродажи: {removed_from_sale}'
+            )
+            return redirect('main:my_prices')
+    else:
+        formset = AppPriceFormSet(queryset=apps)
+    return render(request, 'main/my_prices.html', {'formset': formset})
+
+
+@login_required
+@require_POST
+def remove_from_sale(request, app_id):
+    app = get_object_or_404(App, id=app_id, author=request.user)
+
+    app.price_before_sale = None
+    app.save()
+
+    messages.success(request, f'«{app.name}» снято с распродажи.')
+    return redirect('main:my_prices')
+
 
 @login_required
 def edit_app(request, app_id):
@@ -276,10 +327,13 @@ def edit_app(request, app_id):
         else:
             form = AppForm(request.POST, request.FILES, instance=app)
         if form.is_valid():
-            form.save()
-            messages.success(request, f"Карточка приложения {app.name} изменена")
+            price_changed = 'price' in form.changed_data
+            app = form.save(commit=False)
+            if price_changed:
+                app.price_before_sale = None
+            app.save()
+            messages.success(request, f'Карточка приложения {app.name} изменена')
             return redirect('main:app_detail', app_id=app.id)
-
     else:
         if request.user.is_superuser:
             form = ForSuperUserEditAppForm(instance=app)
@@ -430,4 +484,5 @@ def purchases(request):
         'purchases': items,
         'total': total,
     })
+
 

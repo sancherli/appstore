@@ -185,3 +185,4 @@ class Purchase(models.Model):
         if self.price_paid == 0:
             return 'Бесплатно'
         return f'{self.price_paid} $'
+

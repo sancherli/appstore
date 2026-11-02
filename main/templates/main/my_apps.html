@@ -7,6 +7,8 @@
 
     <p>Приложения, которые опубликовали вы, {{ user.username }}</p>
 
+    <p><a href="{% url 'main:my_prices' %}">Изменить цены сразу у всех</a></p>
+
     <ul>
         {% for app in apps %}
             <li>

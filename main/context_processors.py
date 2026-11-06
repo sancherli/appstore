@@ -5,7 +5,7 @@ from .models import App, Category
 
 
 def store_menu(request):
-    categories = cache.get('memu_categories')
+    categories = cache.get('menu_categories')
     if categories is None:
         categories = list(
             Category.objects

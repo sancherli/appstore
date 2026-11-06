@@ -18,7 +18,6 @@ class AppAdmin(admin.ModelAdmin):
     list_filter = ('category',)
     filter_horizontal = ('favorited_by',)
 
-
 admin.site.register(Review)
 
 
@@ -26,3 +25,4 @@ admin.site.register(Review)
 class AppAdmin(admin.ModelAdmin):
     list_display = ('user', 'app', 'price_paid', 'purchased_at')
     search_fields = ('app', 'user')
+

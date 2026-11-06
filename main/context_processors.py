@@ -26,3 +26,4 @@ def store_menu(request):
         'categories_total': len(categories),
         'favorites_count': favorites_count,
     }
+

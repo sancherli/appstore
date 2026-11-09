@@ -48,7 +48,7 @@ class AppForm(forms.ModelForm):
             'icon': 'Иконка',
         }
         help_texts = {
-            'description': 'используйте BBCode: [b]жирный[/b], [i]курсив[/i], [list]список[/list].',
+            'description': 'Используйте BBCode: [b]жирный[/b], [i]курсив[/i], [list][*]пункт[*]пункт[/list]',
         }
 
 

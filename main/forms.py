@@ -47,6 +47,9 @@ class AppForm(forms.ModelForm):
             'category': 'Категория',
             'icon': 'Иконка',
         }
+        help_texts = {
+            'description': 'используйте BBCode: [b]жирный[/b], [i]курсив[/i], [list]список[/list].',
+        }
 
 
 class ForSuperUserEditAppForm(AppForm):

@@ -1,4 +1,5 @@
 {% extends 'main/base.html' %}
+{% load django_bootstrap5 %}
 
 {% block title %}Вход - AppStore{% endblock %}
 
@@ -10,9 +11,13 @@
     <form method="post" action="{% url 'main:login' %}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ next }}">
-        {{ form.as_p }}
-        <button type="submit">Войти</button>
+        {% bootstrap_form form %}
+        <button type="submit" class="btn btn-primary">Войти</button>
     </form>
+
+    {% if next %}
+    <input type="hidden" name="next" value="{{ next }}">
+    {% endif %}
 
     <p>Нет аккаунта? > <a href="{% url 'main:register' %}">Зарегистрироваться</a></p>
     <p><a href="{% url 'main:password_reset' %}">Забыли пароль?</a></p>

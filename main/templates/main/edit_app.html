@@ -1,5 +1,7 @@
 {% extends 'main/base.html' %}
 
+{% load django_bootstrap5 %}
+
 {% block title %}Редактировать {{ app.name }} - AppStore{% endblock %}
 
 {% block content %}
@@ -7,9 +9,14 @@
 
     <p>Галочка clear удаляет иконку. Если не трогать, ничего не поменяется</p>
 
+    {% if app.icon %}
+        <p>Сейчас:</p>
+        <img src="{{ app.icon.url }}" alt="{{ app.name }}" class="app-icon">
+    {% endif %}
+
     <form method="post" action="{% url 'main:edit_app' app.id %}" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        {% bootstrap_form form %}
         <button type="submit">Применить изменения</button>
     </form>
 

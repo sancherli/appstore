@@ -48,7 +48,8 @@ class AppForm(forms.ModelForm):
             'icon': 'Иконка',
         }
         help_texts = {
-            'description': 'Используйте BBCode: [b]жирный[/b], [i]курсив[/i], [list][*]пункт[*]пункт[/list]',
+            'description': 'Можно использовать BBCode: [b]жирный[/b], [i]курсив[/i], [list]список[/list].',
+            'icon': 'Форматы: JPG, JPEG, PNG, WebP. Картинка будет уменьшена до 256 × 256.',
         }
 
 

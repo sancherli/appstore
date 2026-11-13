@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_bootstrap5',
     'precise_bbcode',
+    'easy_thumbnails',
 
     'main.apps.MainConfig',
 ]
@@ -148,3 +149,4 @@ LOGOUT_REDIRECT_URL = 'main:index'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'store@appstore.local'
+

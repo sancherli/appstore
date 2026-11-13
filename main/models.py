@@ -1,16 +1,26 @@
 from decimal import Decimal, ROUND_HALF_UP
 from math import factorial
+from tabnanny import verbose
 
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.urls import reverse
+from pathlib import Path
+from uuid import uuid4
+from django.core.validators import FileExtensionValidator
+from easy_thumbnails.fields import ThumbnailerImageField
+from PIL import Image
 
 
 def validate_not_negative_price(value):
     if value < 0:
         raise ValidationError('Цена не может быть отрицательной')
+
+def icon_upload_to(instance, filename):
+    extension = Path(filename).suffix.lower()
+    return f'icons/{uuid4().hex}{extension}'
 
 
 class Category(models.Model):
@@ -72,7 +82,18 @@ class App(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
-    icon = models.ImageField(upload_to='icons/', blank=True)
+    icon = ThumbnailerImageField(
+        upload_to=icon_upload_to,
+        resize_source={
+            'size': (256, 256),
+            'crop': True,
+        },
+        blank=True,
+        validators=[FileExtensionValidator(
+            allowed_extensions=['png', 'jpg', 'jpeg', 'webp'],
+            message='Иконка должна быть в формате PNG, JPG или WebP',
+        )],
+    )
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='apps',)
     favorited_by = models.ManyToManyField(User, related_name='favorite_apps', blank=True, verbose_name='В избранном у')
     rating_avg = models.DecimalField(max_digits=2,decimal_places=1,default=0,editable=False,verbose_name='Средняя оценка',)
@@ -186,3 +207,16 @@ class Purchase(models.Model):
             return 'Бесплатно'
         return f'{self.price_paid} $'
 
+
+class Screenshot(models.Model):
+    app = models.ForeignKey(App, on_delete=models.CASCADE, related_name='screenshots')
+    image = ThumbnailerImageField(
+        upload_to='screenshots/',
+        resize_source={'size': (800, 800)},
+        validators=[FileExtensionValidator(['png', 'jpg', 'jpeg', 'webp'])],
+        verbose_name='Скриншот',
+    )
+
+    class Meta:
+        verbose_name = 'Скриншот'
+        verbose_name_plural = 'Скриншоты'

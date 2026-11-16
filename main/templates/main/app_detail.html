@@ -44,11 +44,15 @@
 
     <p>Автор:
         {% if app.author %}
-            {{ app.author.username }}
+        {{ app.author.username }}
         {% else %}
-            не указан
+        не указан
         {% endif %}
     </p>
+    {% if app.author %}
+        <p><a href="{% url 'main:dev_page' app.author.username %}">Страница разработчика</a></p>
+    {% endif %}
+
 
     {% if user.is_authenticated %}
         <form method="post" action="{% url 'main:toggle_favorite' app.id %}">

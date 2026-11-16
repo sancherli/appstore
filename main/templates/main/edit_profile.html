@@ -1,0 +1,13 @@
+{% extends 'main/base.html' %}
+{% load django_bootstrap5 %}
+
+{% block title %}Мой профиль - AppStore{% endblock %}
+
+{% block content %}
+<h2>Мой профиль</h2>
+<form method="post">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button type="submit" class="btn btn-primary">Сохранить</button>
+</form>
+{% endblock %}

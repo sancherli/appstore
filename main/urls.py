@@ -1,10 +1,11 @@
 
 from . import views
 
-from django.urls import path, register_converter
+from django.urls import path, register_converter, re_path
 from .mainapp.converter import YearConverter
 
 register_converter(YearConverter, 'yyyy')
+
 
 app_name = 'main'
 
@@ -48,4 +49,8 @@ urlpatterns = [
 
     path('', views.index, name='index'),
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),
+
+    re_path(r'^dev/(?P<username>[\w.@+-]+)/$', views.dev_page, name='dev_page'),
+    path('my_profile/', views.EditProfileView.as_view(), name='edit_profile'),
 ]
+

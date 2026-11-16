@@ -5,7 +5,9 @@ from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.core.cache import cache
 
-from .models import App, Review, Category, Screenshot
+from django.contrib.auth.models import User
+
+from .models import App, Review, Category, Screenshot, Profile
 
 
 def refresh_app_rating(app_id):
@@ -59,3 +61,12 @@ def delete_screenshot_file(sender, instance, **kwargs):
 @receiver(post_delete, sender=App)
 def delete_app_file(sender, instance, **kwargs):
     instance.icon.delete(save=False)
+
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance,created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+
+

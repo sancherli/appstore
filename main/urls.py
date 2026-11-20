@@ -1,4 +1,3 @@
-
 from . import views
 
 from django.urls import path, register_converter, re_path
@@ -22,7 +21,7 @@ urlpatterns = [
     path('free-apps/', views.AppsIsFreeListView.as_view(), {'is_free': True}, name='free_apps'),
     path('paid-apps/', views.AppsIsFreeListView.as_view(), {'is_free': False}, name='paid_apps'),
 
-    path('api/app/<int:app_id>/', views.api_app_detail, name='api_app_detail'),
+    # path('api/app/<int:app_id>/', views.api_app_detail, name='api_app_detail'),
     path('add-app/', views.add_app, name='add_app'),
     path('my-apps/', views.my_apps, name='my_apps'),
     path('my-apps/prices/', views.my_prices, name='my_prices'),
@@ -52,5 +51,12 @@ urlpatterns = [
 
     re_path(r'^dev/(?P<username>[\w.@+-]+)/$', views.dev_page, name='dev_page'),
     path('my_profile/', views.EditProfileView.as_view(), name='edit_profile'),
+
+    path('api/apps/', views.api_apps, name='api_apps'),
+
+    path('api/apps/<int:pk>/', views.ApiAppsView.as_view(), name='api_app'),
+
+    path('api/devs/', views.api_devs, name='api_devs'),
+    path('api/devs/<int:user_id>/', views.api_devs, name='api_dev'),
 ]
 

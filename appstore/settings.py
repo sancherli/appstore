@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'precise_bbcode',
     'easy_thumbnails',
+    'rest_framework',
 
     'main.apps.MainConfig',
 ]
@@ -150,3 +151,10 @@ LOGOUT_REDIRECT_URL = 'main:index'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'store@appstore.local'
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+    'DEFAULT_PAGINATION_CLASSES': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+}

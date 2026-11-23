@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Витрина AppStore</title>
+</head>
+
+<body>
+    <h1>Витрина AppStore</h1>
+    <ul id="apps"></ul>
+
+    <h2>Вход</h2>
+    <form id="login">
+        <input name="username" placeholder="Логин">
+        <input name="password" type="password" placeholder="Пароль">
+        <button type="submit">Войти</button>
+    </form>
+    <p id="me"></p>
+
+    <script>
+        const API = 'http://127.0.0.1:8000/api/';
+
+        fetch(API + 'apps/')
+            .then(response => response.json())
+            .then(data => {
+                for (const app of data.results) {
+                    const item = document.createElement('li');
+                    item.textContent = app.name + ' - ' + app.price;
+                    document.getElementById('apps').append(item);
+                }
+            });
+
+        document.getElementById('login').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const tokenResponse = await fetch(API + 'token/', {
+                method: 'POST',
+                body: new FormData(event.target),
+            });
+            if (!tokenResponse.ok) {
+                document.getElementById('me').textContent = 'Неверный логин или пароль';
+                return;
+            }
+            const tokens = await tokenResponse.json();
+            const meResponse = await fetch(API + 'me/', {
+                headers: {'Authorization': 'Bearer ' + tokens.access},
+            });
+            const me = await meResponse.json();
+            document.getElementById('me').textContent = 'Вы вошли как ' + me.username;
+        });
+    </script>
+
+</body>
+
+</html>
+

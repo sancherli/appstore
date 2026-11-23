@@ -1,6 +1,8 @@
 from . import views
 
 from django.urls import path, register_converter, re_path
+
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .mainapp.converter import YearConverter
 
 register_converter(YearConverter, 'yyyy')
@@ -58,5 +60,10 @@ urlpatterns = [
 
     path('api/devs/', views.api_devs, name='api_devs'),
     path('api/devs/<int:user_id>/', views.api_devs, name='api_dev'),
+
+    path('api/token/', TokenObtainPairView.as_view(), name='token'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/me/', views.api_me, name='api_me'),
 ]
+
 
